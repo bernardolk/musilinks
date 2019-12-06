@@ -1,0 +1,23 @@
+{
+  "name": "musilinks",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "config": "^3.2.4",
+    "ejs": "^2.7.4",
+    "express": "^4.17.1",
+    "musicbrainz": "^0.2.6",
+    "ngrok": "^3.2.5",
+    "node-fetch": "^2.6.0",
+    "request": "^2.88.0",
+    "require": "^2.4.20",
+    "vis-network": "^6.4.6"
+  }
+}
