@@ -3,7 +3,7 @@
 var nodes = null;
 var edges = null;
 var network = null;
-var nodeIds = [0];
+var nodeIds = [];
 
 var canvasEdgeMargins = 60;
 var networkElement = document.getElementById("mynetwork");
@@ -11,7 +11,6 @@ var bounds = networkElement.getBoundingClientRect();
 var mouseX;
 var mouseY;
 var highlightedNode = null;
-var ghostNodeArtistId = null;
 
 // Node and Edges Styling Consts
 //--------------------------------------
@@ -50,79 +49,21 @@ const releasedNodeOptions = {
 // Initializes the micromodal instance
 MicroModal.init();
 
-document.body.addEventListener("mousemove", function(e) {
-  mouseX = e.clientX - bounds.left;
-  mouseY = e.clientY - bounds.top;
-  console.log(mouseX + " " + mouseY);
-
-  if (ghostNodeArtistId != null) {
-    //let ghostNode = network.body.nodes[ghostNodeId];
-    console.log("ooh");
-    // ghostNode.setOptions({ x: mouseX});
-    // ghostNode.setOptions({ y: mouseY});
-    let gNode = document.getElementById('ghostNode');
-    gNode.style.left = mouseX + 'px';
-    gNode.style.top = mouseY + 'px';
-  }
-});
-
 // Called when the Visualization API is loaded.
 function startNetwork(artistsData) {
-  let nodesArray = [];
   let maxRepulsionMode = false;
+  nodeIds = [];
+  nodes = new vis.DataSet();
+  edges = new vis.DataSet();
 
-  let relArtLeng = Object.keys(artistsData.relatedArtists).length;
-  console.log(relArtLeng);
-  for (let i = 1; i <= relArtLeng; i++) {
-    nodesArray[i] = {
-      id: i,
-      shape: "circularImage",
-      image: artistsData.relatedArtists[i - 1].image,
-      label: artistsData.relatedArtists[i - 1].name,
-      artistId: artistsData.relatedArtists[i - 1].id,
-      spotifyId: artistsData.relatedArtists[i - 1].spotifyId,
-      membersCreated: false,
-      relArtistsCreated: false,
-      size: nodeSize
-    };
-    nodeIds.push(i);
-  }
+  let container = document.getElementById("mynetwork");
 
-  nodesArray[0] = {
-    id: 0,
-    shape: "circularImage",
-    image: artistsData.artist.image,
-    label: artistsData.artist.name,
-    artistId: artistsData.artist.id,
-    spotifyId: artistsData.artist.spotifyId,
-    membersCreated: true,
-    relArtistsCreated: false,
-    size: parentNodeSize,
-    mass: 100,
-    font: { size: parentFontSize },
-    fixed: true,
-    borderWidth: largerBorderWidth
-  };
-
-  nodes = new vis.DataSet(nodesArray);
-
-  // create connections between nodes
-  let edgesArray = [];
-  let edgesQty = nodesArray.length;
-
-  for (var i = 1; i < edgesQty; i++) {
-    edgesArray.push({ id: i, from: 0, to: i });
-  }
-  edges = new vis.DataSet(edgesArray);
-
-  var container = document.getElementById("mynetwork");
-
-  var data = {
+  let data = {
     nodes: nodes,
     edges: edges
   };
 
-  var options = {
+  let options = {
     nodes: {
       size: nodeSize,
       color: {
@@ -161,6 +102,12 @@ function startNetwork(artistsData) {
 
   network = new vis.Network(container, data, options);
 
+  createNode(artistsData, null, null);
+
+  //-------------------------------------------------
+  //        Event Listeners
+  //-------------------------------------------------
+
   network.on("dragEnd", function(params) {
     if (params.nodes.length > 0 && params.edges.length > 0) {
       let releasedNodeId = params.nodes[0];
@@ -173,21 +120,10 @@ function startNetwork(artistsData) {
       ) {
         // checks if this node has already generated children
         if (releasedNode.options.membersCreated == false) {
-          // effects applied to the node after it is released
-          releasedNode.setOptions(releasedNodeOptions);
-
-          // Augment original node length upon release
-          releasedNode.edges[0].setOptions({ length: largerEdgeLegth });
-
-          // change released node's edges to another color
-          for (let i = 0; i < params.edges.length; i++) {
-            let selectedEdgeId = params.edges[i];
-            let selectedEdge = network.body.edges[selectedEdgeId];
-            selectedEdge.setOptions({ color: { color: parentNodeColor } });
-          }
-
           // set a post request with artistId as body
           let artistId = releasedNode.options.artistId;
+
+          releasedNode.setOptions(releasedNodeOptions);
 
           let showParams = {
             method: "POST",
@@ -195,6 +131,7 @@ function startNetwork(artistsData) {
             body: JSON.stringify({ "artist-id": artistId })
           };
 
+    
           // send request for artist's related artists
           fetch("/show", showParams)
             .then(function(res) {
@@ -345,10 +282,10 @@ function onCloseNodeModal(spotifyModalElement) {
   spotifyModalElement.removeChild(document.getElementById("spotify-player"));
   let relArtists = spotifyModalElement.getElementsByClassName("rounded-circle");
   let relLen = relArtists.length;
-  console.log(relArtists);
+  //console.log(relArtists);
   for (let i = 0; i < relLen; i++) {
     relArtists[0].parentNode.removeChild(relArtists[0]);
-    console.log(i + "/" + relLen);
+    //console.log(i + "/" + relLen);
   }
 }
 
@@ -356,6 +293,21 @@ function onCloseNodeModal(spotifyModalElement) {
 function renderCluster(targetNodeId, relatedArtists) {
   let numberOfArtists = Object.keys(relatedArtists).length;
   let targetNode = network.body.nodes[targetNodeId];
+
+  // parent node configuration
+  targetNode.setOptions(releasedNodeOptions);
+
+  // Augment original node length upon release
+  if (targetNode.edges.length > 0) {
+    targetNode.edges[0].setOptions({ length: largerEdgeLegth });
+
+    // change released node's edges to another color
+    for (let i = 0; i < targetNode.edges.length; i++) {
+      let selectedEdgeId = targetNode.edges[i].id;
+      let selectedEdge = network.body.edges[selectedEdgeId];
+      selectedEdge.setOptions({ color: { color: parentNodeColor } });
+    }
+  }
 
   for (let i = 0; i < numberOfArtists; i++) {
     let lastNodeId = nodeIds[nodeIds.length - 1];
@@ -421,41 +373,47 @@ function clearNetwork() {
   }
 }
 
-function createGhostNode(artistId, name, img) {
-  console.log("ghost node method activated ");
-  let lastNodeId = nodeIds[nodeIds.length - 1];
-  nodeIds.push(lastNodeId + 1);
-  if (network == null) {
-    let params = {
-      method: "POST",
-      headers: {
-        "content-type": "application/json"
-      },
-      body: JSON.stringify({ "artist-id": artistId })
-    };
-
-    fetch("/show", params)
-      .then(function(response) {
-        return response.json();
-      })
-      .then(function(resJson) {
-        // deletes the network and restarts it with the newly selected artist's data
-        clearNetwork();
-        startNetwork(resJson);
-      });
+function createNode(artistsData, Xo, Yo) {
+  let relArtLeng = Object.keys(artistsData.relatedArtists).length;
+  let lastNodeId;
+  if (nodeIds.length > 0) {
+    lastNodeId = nodeIds[nodeIds.length - 1];
   } else {
+    lastNodeId = -1;
+  }
+
+  // checks the entire network for an identical node
+  let mainArtistNodeId = null;
+
+  for (let j = 0; j <= lastNodeId; j++) {
+    if (network.body.nodes[j].options.artistId == artistsData.artist.id) {
+      mainArtistNodeId = network.body.nodes[j].options.id;
+      break;
+    }
+  }
+
+  // if node does not already exists in network
+  if (!mainArtistNodeId) {
     nodes.add({
       id: lastNodeId + 1,
-      artistId: artistId,
-      spotifyId: null,
-      membersCreated: false,
+      shape: "circularImage",
+      image: artistsData.artist.image,
+      label: artistsData.artist.name,
+      artistId: artistsData.artist.id,
+      spotifyId: artistsData.artist.spotifyId,
+      membersCreated: true,
       relArtistsCreated: false,
-      label: name,
-      image: img,
-      x: 0,
-      y: 0
+      size: parentNodeSize,
+      mass: 100,
+      font: { size: parentFontSize },
+      fixed: true,
+      x: Xo,
+      y: Yo,
+      borderWidth: largerBorderWidth
     });
-
-    ghostNodeId = lastNodeId + 1;
+    nodeIds.push(lastNodeId + 1);
+    renderCluster(lastNodeId + 1, artistsData.relatedArtists);
+  } else {
+    renderCluster(mainArtistNodeId, artistsData.relatedArtists);
   }
 }
