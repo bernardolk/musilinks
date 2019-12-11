@@ -1,31 +1,78 @@
 var ghostNodeClick = false;
 var ghostNodeHolder = null;
 
-document.body.addEventListener("mousemove", function(e){
+var mainModalOpen = false;
+var searchInputElement = document.getElementById("search-bar-text");
+
+
+MicroModal.show('main-modal');
+
+//MicroModal.show('loading-modal');
+
+
+function showLoader(){
+  MicroModal.show('loading-modal');
+}
+
+function closeLoader(){
+  MicroModal.close('loading-modal');
+}
+
+
+document.onkeypress = function(e) {
+  e = e || window.event;
+  let charCode = typeof e.which == "number" ? e.which : e.keyCode;
+  if (charCode && !mainModalOpen) {
+    MicroModal.show("main-modal", {
+      onClose: onMainModalClose
+      ,onShow: onMainModalShow
+    });
+  }
+};
+
+// document.onkeydown = function(e) {
+//   e = e || window.event;
+//   let keyCode = e.keyCode;
+//   if (keyCode == 8) {
+//     console.log("yay");
+//     keyInput = keyInput.slice(0, -1);
+//     //console.log(keyInput);
+//     searchInputElement.value = keyInput;
+//   }
+// };
+
+const onMainModalClose = function() {
+  mainModalOpen = false;
+  searchBar.value = '';
+};
+
+const onMainModalShow = function(){
+  mainModalOpen = true;
+}
+
+document.body.addEventListener("mousemove", function(e) {
   mouseX = e.clientX - bounds.left;
   mouseY = e.clientY - bounds.top;
 
-  if (ghostNodeHolder != null) {  
-    let nodeX = mouseX - nodeSize / 2;
-    let nodeY = mouseY - nodeSize / 2 + bounds.top;  
+  if (ghostNodeHolder != null) {
+    let nodeX = mouseX - parentNodeSize * network.getScale();
+    let nodeY = mouseY - parentNodeSize * network.getScale() + bounds.top;
 
     ghostNodeHolder.style.left = nodeX + "px";
     ghostNodeHolder.style.top = nodeY + "px";
 
     let ghostNodeClickHandler = function(e) {
-      console.log("node clicked");
       ghostNodeClick = true;
-    }
+    };
 
-    ghostNodeHolder.addEventListener(
-      "click",
-      ghostNodeClickHandler
-    );
+    ghostNodeHolder.addEventListener("click", ghostNodeClickHandler);
 
     if (ghostNodeClick) {
-      ghostNodeHolder.parentNode.removeChild(ghostNodeHolder);
-      let clickedArtistId = ghostNodeHolder.getAttribute('data-artistId');
+      let clickedArtistId = ghostNodeHolder.getAttribute("data-artistId");
       let canvasCoords = network.DOMtoCanvas({ x: mouseX, y: mouseY });
+      ghostNodeHolder.parentNode.removeChild(ghostNodeHolder);
+
+      showLoader();
 
       let params = {
         method: "POST",
@@ -35,13 +82,10 @@ document.body.addEventListener("mousemove", function(e){
         body: JSON.stringify({ "artist-id": clickedArtistId })
       };
 
-      
-      document.body.removeEventListener(
-        "click",
-        ghostNodeClickHandler
-      );
-      ghostNodeHolder = null;
+      document.body.removeEventListener("click", ghostNodeClickHandler);
+
       ghostNodeClick = false;
+      ghostNodeHolder = null;
 
       fetch("/show", params)
         .then(function(response) {
@@ -49,6 +93,7 @@ document.body.addEventListener("mousemove", function(e){
         })
         .then(function(resJSON) {
           //console.log(resJSON);
+          closeLoader();
           createNode(resJSON, canvasCoords.x, canvasCoords.y);
         });
     }
@@ -100,7 +145,7 @@ function autocomplete(inp) {
             a = document.createElement("DIV");
             a.setAttribute("id", this.id + "autocomplete-list");
             a.setAttribute("class", "autocomplete-items");
-            this.parentNode.appendChild(a);
+            document.getElementById("main-form").appendChild(a);
 
             for (i = 0; i < jsonLength; i++) {
               b = document.createElement("DIV");
@@ -122,15 +167,17 @@ function autocomplete(inp) {
               c.setAttribute(
                 "class",
                 "btn btn-success btn-lg  autocomplete-btn"
-              );
+              );           
               c.innerHTML = "+";
               b.appendChild(c);
 
               // On 'add' button click
               c.addEventListener("click", function(e) {
                 e.stopPropagation();
-
+              
                 closeAllLists();
+
+                MicroModal.close("main-modal");
 
                 let clickedArtistId = this.parentNode
                   .getElementsByTagName("input")[0]
@@ -149,12 +196,16 @@ function autocomplete(inp) {
                     body: JSON.stringify({ "artist-id": clickedArtistId })
                   };
 
+                  // Loading animation
+                  showLoader();
+
                   fetch("/show", params)
                     .then(function(response) {
                       return response.json();
                     })
                     .then(function(resJson) {
                       // deletes the network and restarts it with the newly selected artist's data
+                      closeLoader();
                       clearNetwork();
                       startNetwork(resJson);
                     });
@@ -182,17 +233,27 @@ function autocomplete(inp) {
                         "class",
                         "ghost-node rounded-circle"
                       );
-                      ghostNodeHolder.setAttribute("width", nodeSize);
-                      ghostNodeHolder.setAttribute("height", nodeSize);
+                      ghostNodeHolder.setAttribute(
+                        "width",
+                        320 * network.getScale()
+                      );
+                      ghostNodeHolder.setAttribute(
+                        "height",
+                        320 * network.getScale()
+                      );
                       ghostNodeHolder.src = resJSON["image"];
-                      ghostNodeHolder.setAttribute("data-artistId", clickedArtistId);
-                      document.body.appendChild(ghostNodeHolder);                
+                      ghostNodeHolder.setAttribute(
+                        "data-artistId",
+                        clickedArtistId
+                      );
+                      document.body.appendChild(ghostNodeHolder);
                     });
                 }
               });
 
               b.addEventListener("click", function(e) {
                 console.log("Network restarting...");
+                MicroModal.close("main-modal");
                 let params = {
                   method: "POST",
                   headers: {
@@ -206,8 +267,9 @@ function autocomplete(inp) {
                     )
                   })
                 };
-                //showSearchItems = false;
                 closeAllLists();
+
+                showLoader();
 
                 fetch("/show", params)
                   .then(function(response) {
@@ -215,6 +277,7 @@ function autocomplete(inp) {
                   })
                   .then(function(resJson) {
                     // deletes the network and restarts it with the newly selected artist's data
+                    closeLoader();
                     clearNetwork();
                     startNetwork(resJson);
                   });

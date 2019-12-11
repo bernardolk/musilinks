@@ -13,9 +13,9 @@
     border-top: none;
     z-index: 99;
     /*position the autocomplete items to be the same width as the container:*/
-    top: 75%;
-    /*left: 60%;
-    right: 5%;*/
+    /*top: 75%;*/
+    left: 35%;
+    /*right: 5% */
     width: 30%;
   }
   .autocomplete-items div {
@@ -69,9 +69,28 @@
     z-index: 98;
     left: 100px;
     top: 100px;
+    opacity: 0.8;
+    border: 3px solid #00449e;
+    box-shadow: 0 3px 2px rgba(0, 0, 0, 0.3);
   }
 
+  .related-artist-image{
+    float: right;
+  }
 
+  .loader {
+    border: 16px solid #1b2b757a; /* Light grey */
+    border-top: 16px solid #0f9e46; /* Blue */
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
 
 
 /**************************\
@@ -121,7 +140,7 @@
   }
   
   .modal__close {
-    background: transparent;
+    background-color: #d4d4d4;
     border: 0;
   }
   
@@ -168,11 +187,79 @@
   }
   
   .modal__btn-primary {
-    background-color: #00449e;
+    background-color: #47b876;
     color: #fff;
   }
   
+  .main__modal__container {
+    background-color: #1a2636;
+    padding: 30px;
+    max-width: 1200px;
+    max-height: 80vh;
+    width: 60%;
+    height: 45%;
+    border-radius: 45px;
+    overflow-y: auto;
+    box-sizing: border-box;
+  }
+
+  .main__modal__title {
+    margin-top: 30px;
+    margin-bottom: 0;
+    font-weight: 900;
+    font-size: 4rem;
+    line-height: 1.25;
+    text-align: center;
+    color: #3bb94c;
+    text-shadow: -4px 0 0 #ffffffea, -4px 0 0 #ffffffea, 0 4px 0 #ffffffea, 0 -4px 0 #ffffffea;
+    font-family: monospace;
+    box-sizing: border-box;
+  }
   
+  .main__modal__content {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    line-height: 1.5;
+    color: rgba(0,0,0,.8);
+    text-align: center;
+    width: 100%;
+    height: 45%;
+  }
+
+  .placeholder-icon{
+    border: 2px solid rgba(41, 81, 146, 0.671);
+    border-radius: 3px;
+    width: 48px;
+    height: 48px;   
+    margin: 16px;
+    /*block-size: 32px;*/
+  }
+
+  .placeholder-icon-left{
+    float: left;
+  }
+
+  .placeholder-icon-right{
+    float: right;
+  }
+
+  #main-form{
+    display: inline-block;
+    margin-top: 1rem;
+    width: 100%;
+    align-items: center;
+  }
+
+  input{
+    width: 70%;
+    padding: 10px 16px;
+    margin: 8px 0;
+    border: 2px solid  rgba(41, 81, 146, 0.671);
+    font-size: 1.5rem;
+    color: #ffffffef;
+    box-sizing: border-box;
+    background-color: #00459e2c;
+  }
   
   /**************************\
     Demo Animation Style

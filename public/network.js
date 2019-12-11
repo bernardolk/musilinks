@@ -25,7 +25,7 @@ const parentNodeSize = 160;
 const defaultFontSize = 40;
 const parentFontSize = 55;
 const defaultFontColor = "#eeeeee";
-const minRepulsion = 400;
+const minRepulsion = 500;
 const maxRepulsion = 1000;
 const defaultBorderWidth = 2;
 const largerBorderWidth = 5;
@@ -49,8 +49,17 @@ const releasedNodeOptions = {
 // Initializes the micromodal instance
 MicroModal.init();
 
+function initLoader(){
+  MicroModal.show('loading-modal');
+}
+
+function closeLoader(){
+  MicroModal.close('loading-modal');
+}
+
 // Called when the Visualization API is loaded.
 function startNetwork(artistsData) {
+  
   let maxRepulsionMode = false;
   nodeIds = [];
   nodes = new vis.DataSet();
@@ -108,6 +117,18 @@ function startNetwork(artistsData) {
   //        Event Listeners
   //-------------------------------------------------
 
+  network.once("startStabilizing", function() {
+    var scaleOption = { scale: 0.8 };
+    network.moveTo({
+      scale: 0.5,
+      animation: {
+        // -------------------> can be a boolean too!
+        duration: 1000,
+        easingFunction: "easeOutQuad"
+      }
+    });
+  });
+
   network.on("dragEnd", function(params) {
     if (params.nodes.length > 0 && params.edges.length > 0) {
       let releasedNodeId = params.nodes[0];
@@ -123,6 +144,11 @@ function startNetwork(artistsData) {
           // set a post request with artistId as body
           let artistId = releasedNode.options.artistId;
 
+          // Augment original node length upon release
+          network.body.edges[params.edges[0]].setOptions({
+            length: largerEdgeLegth
+          });
+
           releasedNode.setOptions(releasedNodeOptions);
 
           let showParams = {
@@ -131,7 +157,6 @@ function startNetwork(artistsData) {
             body: JSON.stringify({ "artist-id": artistId })
           };
 
-    
           // send request for artist's related artists
           fetch("/show", showParams)
             .then(function(res) {
@@ -269,7 +294,7 @@ function openNodeModal(params) {
       for (let i = 0; i < resLen; i++) {
         let relArtImg = document.createElement("img");
         relArtImg.setAttribute("id", "rel-artist-img-" + i);
-        relArtImg.setAttribute("class", "rounded-circle");
+        relArtImg.setAttribute("class", "rounded-circle related-artist-image");
         relArtImg.setAttribute("width", "60");
         relArtImg.setAttribute("height", "60");
         relArtImg.src = resJSON[i].image;

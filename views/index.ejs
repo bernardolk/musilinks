@@ -12,7 +12,7 @@
       integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
       crossorigin="anonymous"
     />
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="style.css" />
     <script
       type="text/javascript"
       src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.js"
@@ -31,7 +31,7 @@
       src="https://unpkg.com/micromodal/dist/micromodal.min.js"
     ></script>
 
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <!-- <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <a class="navbar-brand" href="#">Musilinks</a>
       <button
         class="navbar-toggler"
@@ -42,7 +42,7 @@
         aria-expanded="false"
         aria-label="Toggle navigation"
       >
-      <span class="navbar-toggler-icon"></span>
+        <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <form class="form-inline my-2 my-lg-0" autocomplete="off">
@@ -50,40 +50,91 @@
             class="form-control mr-sm-2"
             type="search"
             placeholder="Search music"
-            aria-label="Search"
-            id="search-bar"
+            aria-label="Search"            
           />
         </form>
       </div>
-    </nav>
+    </nav> -->
   </head>
 
   <body>
     <!-- Network -->
     <div id="mynetwork"></div>
-
     <!-- Artist's information dialog modal -->
     <div class="modal micromodal-slide" id="modal-1" aria-hidden="true">
       <div class="modal__overlay" tabindex="-1" data-micromodal-close>
-        <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-1-title">
+        <div
+          class="modal__container"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-1-title"
+        >
           <header class="modal__header">
             <h2 class="modal__title" id="modal-1-title">
               Artist
             </h2>
-            <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
+            <button
+              class="modal__close"
+              aria-label="Close modal"
+              data-micromodal-close
+            ></button>
           </header>
           <main class="modal__content" id="modal-1-content">
-            <div class="modal__spotifyarea" id="modal-1-spotify">       
-            </div>
+            <div class="modal__spotifyarea" id="modal-1-spotify"></div>
             <p>
-              Try hitting the <code>tab</code> key and notice how the focus stays within the modal itself. Also, <code>esc</code> to close modal.
+              Try hitting the <code>tab</code> key and notice how the focus
+              stays within the modal itself. Also, <code>esc</code> to close
+              modal.
             </p>
           </main>
           <footer class="modal__footer">
             <button class="modal__btn modal__btn-primary">Continue</button>
-            <button class="modal__btn" data-micromodal-close aria-label="Close this dialog window">Close</button>
+            <button
+              class="modal__btn"
+              data-micromodal-close
+              aria-label="Close this dialog window"
+            >
+              Close
+            </button>
           </footer>
         </div>
+      </div>
+    </div>
+
+    <!-- Main screen -->
+    <div class="modal micromodal-slide" id="main-modal" aria-hidden="true">
+      <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+        <div
+          class="main__modal__container"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-1-title"
+        >
+          <h2 class="main__modal__title" id="main-modal-title">
+            Musilinks
+          </h2>
+          <main class="main__modal__content" id="main-modal-content">
+            <form id="main-form">
+              <input id="search-bar" type="text" name="search-bar-text" />
+            </form>
+          </main>
+          <footer class="main__modal__footer">
+            <div id="main-modal-icons">
+              <div class="placeholder-icon placeholder-icon-left"></div>
+              <div class="placeholder-icon placeholder-icon-left"></div>
+              <div class="placeholder-icon placeholder-icon-left"></div>
+              <div class="placeholder-icon placeholder-icon-left"></div>
+              <div class="placeholder-icon placeholder-icon-right"></div>
+            </div>
+          </footer>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading screen modal-->
+    <div class="modal micromodal-slide" id="loading-modal" aria-hidden="true">
+      <div class="modal__overlay" tabindex="-1">
+        <div class="loader"></div>
       </div>
     </div>
 

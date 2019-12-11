@@ -138,25 +138,22 @@ async function main() {
   });
 
   // Route when user clicks in 'add' button
-  app.post("/add", jsonParser, async function(req,res){
-    let artistName = req.body['artist-name'];
+  app.post("/add", jsonParser, async function(req, res) {
+    let artistName = req.body["artist-name"];
     let spotifySearch = await quickSearchSpotify(artistName);
-    if(spotifySearch.artists.items.length > 0){
+    if (spotifySearch.artists.items.length > 0) {
       let artistSpotifyId = spotifySearch.artists.items[0].id;
       let artistInfo = await getArtistInfo(artistSpotifyId);
-      if(artistInfo.images.length > 1){
+      if (artistInfo.images.length > 1) {
         //console.log(artistInfo.images[0].url);
-        res.json({'image' : artistInfo.images[0].url});
+        res.json({ image: artistInfo.images[0].url });
+      } else {
+        res.json({ image: "notfound.jpg" });
       }
-      else{
-        res.json({'image' : 'notfound.jpg'});
-      }
-    }
-    else{
-      res.json({'image' : 'notfound.jpg'});
+    } else {
+      res.json({ image: "notfound.jpg" });
     }
   });
-
 
   http.createServer(app).listen(app.get("port"), function() {
     console.log("Server up and running on port " + app.get("port"));
@@ -228,10 +225,7 @@ function searchSpotify(searchInput) {
 function quickSearchSpotify(artistName) {
   let BASE_URL = "https://api.spotify.com/v1/search?";
   let FETCH_URL =
-    BASE_URL +
-    'q="' +
-    encodeURIComponent(artistName) +
-    '"&type=artist&limit=1';
+    BASE_URL + 'q="' + encodeURIComponent(artistName) + '"&type=artist&limit=1';
 
   return fetch(FETCH_URL, spotifyGetParams).then(function(res) {
     return res.json();
@@ -282,7 +276,7 @@ function searchMusicbrainz(searchInput) {
       return res.json();
     })
     .then(function(resJSON) {
-      //console.log(responseJSON);
+      //console.log(resJSON);
       if (resJSON.artists.length > 0) {
         let displayLength = resJSON.artists.length;
         if (displayLength > 5) {
@@ -309,7 +303,6 @@ function getMbArtist(artistId) {
   let BASE_URL = "https://musicbrainz.org/ws/2/";
   let FETCH_URL = BASE_URL + "artist/" + artistId + "?inc=artist-rels&fmt=json";
 
-
   let mbFetchParams = {
     method: "GET",
     mode: "cors",
@@ -326,6 +319,10 @@ function getMbArtist(artistId) {
         relations: [{ spotify: { image: "notfound.jpg", id: "" } }]
       };
 
+      for (let kk = 0; kk < Object.keys(resJSON.relations).length; kk++) {
+        console.log("type: " + resJSON.relations[kk].type);
+        console.log(resJSON.relations[kk].artist);
+      }
       // constructs the relations array of objects, filtering duplicate results
       // (musicbrainz considers two relations for the same band if a member was a member
       // during two distinct periods of time, for instance)
@@ -337,7 +334,10 @@ function getMbArtist(artistId) {
 
       // scan related artists
       for (let i = 0; i < relLength; i++) {
-        if (!idList.includes(resJSON.relations[i].artist.id)) {
+        if (
+          !idList.includes(resJSON.relations[i].artist.id) &&
+          resJSON.relations[i].type == "member of band"
+        ) {
           idList.push(resJSON.relations[i].artist.id);
           response.relations[relCounter] = resJSON.relations[i];
           response.relations[relCounter].spotify = {
@@ -347,17 +347,15 @@ function getMbArtist(artistId) {
 
           // checks if spotify know's who this artist is. If yes, get his spotify's id.
           // does only for band members (crew members and session musicians are ignored)
-          if (resJSON.relations[i].type == "member of band") {
-            // spotify fetch
-            let search = await quickSearchSpotify(
-              resJSON.relations[i].artist.name
-            );
+          // spotify fetch
+          let search = await quickSearchSpotify(
+            resJSON.relations[i].artist.name
+          );
 
-            if (search.artists.items.length > 0) {
-              response.relations[relCounter].spotify.id =
-                search.artists.items[0].id;
-              artistsSpotifyIds.push(search.artists.items[0].id);
-            }
+          if (search.artists.items.length > 0) {
+            response.relations[relCounter].spotify.id =
+              search.artists.items[0].id;
+            artistsSpotifyIds.push(search.artists.items[0].id);
           }
           relCounter++;
         }
