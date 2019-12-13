@@ -4,28 +4,25 @@ var ghostNodeHolder = null;
 var mainModalOpen = false;
 var searchInputElement = document.getElementById("search-bar-text");
 
-
-MicroModal.show('main-modal');
+MicroModal.show("main-modal");
 
 //MicroModal.show('loading-modal');
 
-
-function showLoader(){
-  MicroModal.show('loading-modal');
+function showLoader() {
+  MicroModal.show("loading-modal");
 }
 
-function closeLoader(){
-  MicroModal.close('loading-modal');
+function closeLoader() {
+  MicroModal.close("loading-modal");
 }
-
 
 document.onkeypress = function(e) {
   e = e || window.event;
   let charCode = typeof e.which == "number" ? e.which : e.keyCode;
   if (charCode && !mainModalOpen) {
     MicroModal.show("main-modal", {
-      onClose: onMainModalClose
-      ,onShow: onMainModalShow
+      onClose: onMainModalClose,
+      onShow: onMainModalShow
     });
   }
 };
@@ -43,12 +40,12 @@ document.onkeypress = function(e) {
 
 const onMainModalClose = function() {
   mainModalOpen = false;
-  searchBar.value = '';
+  searchBar.value = "";
 };
 
-const onMainModalShow = function(){
+const onMainModalShow = function() {
   mainModalOpen = true;
-}
+};
 
 document.body.addEventListener("mousemove", function(e) {
   mouseX = e.clientX - bounds.left;
@@ -86,13 +83,12 @@ document.body.addEventListener("mousemove", function(e) {
 
       ghostNodeClick = false;
       ghostNodeHolder = null;
-
+    
       fetch("/show", params)
         .then(function(response) {
           return response.json();
         })
         .then(function(resJSON) {
-          //console.log(resJSON);
           closeLoader();
           createNode(resJSON, canvasCoords.x, canvasCoords.y);
         });
@@ -167,14 +163,14 @@ function autocomplete(inp) {
               c.setAttribute(
                 "class",
                 "btn btn-success btn-lg  autocomplete-btn"
-              );           
+              );
               c.innerHTML = "+";
               b.appendChild(c);
 
               // On 'add' button click
               c.addEventListener("click", function(e) {
                 e.stopPropagation();
-              
+
                 closeAllLists();
 
                 MicroModal.close("main-modal");
@@ -199,16 +195,20 @@ function autocomplete(inp) {
                   // Loading animation
                   showLoader();
 
-                  fetch("/show", params)
-                    .then(function(response) {
-                      return response.json();
-                    })
-                    .then(function(resJson) {
-                      // deletes the network and restarts it with the newly selected artist's data
-                      closeLoader();
-                      clearNetwork();
-                      startNetwork(resJson);
-                    });
+                  console.time("show");
+                fetch("/show", params)
+                  .then(function(response) {
+                    return response.json();
+                  })
+                  .then(function(resJson) {
+                    console.time("show");
+                    // deletes the network and restarts it with the newly selected artist's data
+                    console.time("render");
+                    closeLoader();
+                    clearNetwork();
+                    startNetwork(resJson);
+                    console.time("render");
+                  });
                 } else {
                   // Pass selected artist information to server to render node
                   let params = {
@@ -271,15 +271,19 @@ function autocomplete(inp) {
 
                 showLoader();
 
+                console.time("show");
                 fetch("/show", params)
                   .then(function(response) {
                     return response.json();
                   })
                   .then(function(resJson) {
+                    console.time("show");
                     // deletes the network and restarts it with the newly selected artist's data
+                    console.time("render");
                     closeLoader();
                     clearNetwork();
                     startNetwork(resJson);
+                    console.time("render");
                   });
               });
 

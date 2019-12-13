@@ -196,8 +196,8 @@
     padding: 30px;
     max-width: 1200px;
     max-height: 80vh;
-    width: 60%;
-    height: 45%;
+    width: 70%;
+    /*max-height: 45%;*/
     border-radius: 45px;
     overflow-y: auto;
     box-sizing: border-box;

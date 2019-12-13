@@ -46,16 +46,10 @@ const releasedNodeOptions = {
   font: { size: parentFontSize }
 };
 
+
 // Initializes the micromodal instance
 MicroModal.init();
 
-function initLoader(){
-  MicroModal.show('loading-modal');
-}
-
-function closeLoader(){
-  MicroModal.close('loading-modal');
-}
 
 // Called when the Visualization API is loaded.
 function startNetwork(artistsData) {
@@ -118,11 +112,9 @@ function startNetwork(artistsData) {
   //-------------------------------------------------
 
   network.once("startStabilizing", function() {
-    var scaleOption = { scale: 0.8 };
     network.moveTo({
       scale: 0.5,
       animation: {
-        // -------------------> can be a boolean too!
         duration: 1000,
         easingFunction: "easeOutQuad"
       }
