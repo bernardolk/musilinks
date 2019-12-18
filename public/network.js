@@ -1,16 +1,17 @@
-// var DIR = 'https://www.thetaranights.com/wp-content/uploads/2018/fiverr_reviews/';
-
 var nodes = null;
 var edges = null;
 var network = null;
 var nodeIds = [];
 
-var canvasEdgeMargins = 60;
 var networkElement = document.getElementById("mynetwork");
 var bounds = networkElement.getBoundingClientRect();
 var mouseX;
 var mouseY;
 var highlightedNode = null;
+
+const relArtistsPerRowInModal = 4;
+const doubleClickInterval = 300;
+
 
 // Node and Edges Styling Consts
 //--------------------------------------
@@ -74,8 +75,6 @@ function startNetwork(artistsData) {
       font: { color: defaultFontColor, size: defaultFontSize },
       shape: "circularImage",
       borderWidth: defaultBorderWidth
-      // membersCreated: false,
-      // relArtistsCreated: false
     },
     edges: {
       selectionWidth: 0,
@@ -85,12 +84,6 @@ function startNetwork(artistsData) {
       }
     },
     physics: {
-      // barnesHut: {
-      //   springLength: 800,
-      //   springConstant: 0.03,
-      //   avoidOverlap: 1,
-      //   centralGravity: 0
-      // }
       solver: "repulsion",
       repulsion: {
         nodeDistance: minRepulsion,
@@ -149,37 +142,23 @@ function startNetwork(artistsData) {
     }
   });
 
-  network.on("hoverNode", function(params) {
-    params.event = "[original event]";
-  });
-
-  network.on("dragging", function(params) {
-    if (params.nodes.length > 0) {
-      //console.log("DRAGGING NODE");
-    }
-  });
-
-  var clickThreshold = 300;
-
   network.on("click", function(params) {
     var clickTime = new Date();
 
-    if (clickTime - doubleClickTime > clickThreshold) {
+    if (clickTime - doubleClickTime > doubleClickInterval) {
       setTimeout(function() {
-        if (clickTime - doubleClickTime > clickThreshold) {
+        if (clickTime - doubleClickTime > doubleClickInterval) {
           onClick(params);
         }
-      }, clickThreshold);
+      }, doubleClickInterval);
     }
   });
 
   function onClick(params) {
     if (params.nodes.length > 0) {
       highlightedNode = network.body.nodes[params.nodes[0]];
-      console.log("CLICK");
     } else {
       highlightedNode = null;
-      console.log("UNCLICK");
     }
   }
 
@@ -212,7 +191,7 @@ function startNetwork(artistsData) {
         ) {
           // user clicked on a node and now is double clicking outside it
           let canvasCoords = network.DOMtoCanvas({ x: mouseX, y: mouseY });
-          console.log(canvasCoords);
+  
           highlightedNode.setOptions({
             x: canvasCoords.x,
             y: canvasCoords.y
@@ -229,13 +208,12 @@ function startNetwork(artistsData) {
   });
 }
 
-function openNodeModal(params) {
+async function openNodeModal(params) {
   let selectedNode = network.body.nodes[params.nodes[0]];
-  document.getElementById("modal-1-title").innerHTML =
-    selectedNode.options.label;
+  // Set artist's name as title of the modal
+  document.getElementById("modal-1-title").innerHTML = selectedNode.options.label;
 
-  console.log("SPOTIFY ID: " + selectedNode.options.spotifyId);
-
+  // Creates spotify player 
   let spotifyModalElement = document.getElementById("modal-1-player");
   let player = document.createElement("iframe");
   player.id = "spotify-player";
@@ -248,61 +226,60 @@ function openNodeModal(params) {
   player.allow = "encrypted-media";
   spotifyModalElement.appendChild(player);
 
+  // Opens modal
   MicroModal.show("modal-1", {
     onClose: modal => onCloseNodeModal(spotifyModalElement)
   });
 
-  console.log("ID = " + selectedNode.options.spotifyId);
-
-  let relatedParams = {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({
-      "artist-spotify-id": selectedNode.options.spotifyId
-    })
-  };
-
   let spotifyRelArtistElement = document.getElementById("modal-1-related");
 
-  fetch("/related", relatedParams)
-    .then(function(res) {
-      return res.json();
-    })
-    .then(function(resJSON) {
-      let resLen = Object.keys(resJSON).length;
-      console.log(resLen);
+  // fetch data from spotify
+  let spotifyRelArtists = await getRelatedArtists(selectedNode.options.spotifyId);
+    
+  // Creates more 'friendly' object to work with (not realy needed anymore)
+  let relArtists = {};
+  let relLength = spotifyRelArtists.artists.length;
+  for (let i = 0; i < relLength; i++) {
+    relArtists[i] = {
+      name: spotifyRelArtists.artists[i].name,
+      spotifyId: spotifyRelArtists.artists[i].id,
+      genres: spotifyRelArtists.artists[i].genres,
+      image: "notfound.jpg"
+    };
+    if (spotifyRelArtists.artists[i].images.length > 0) {
+      relArtists[i].image = spotifyRelArtists.artists[i].images[0].url;
+    }
+  }  
 
-      let imgNumberPerRow = 4;
-      let newRow;
+  // Create related artist's image elements
+  let newRow;
+  for (let i = 0; i < Object.keys(relArtists).length; i++) {
+    if (i % relArtistsPerRowInModal == 0) {
+      newRow = document.createElement("div");
+      newRow.setAttribute("id", "related-artist-row-" + i);
+      newRow.setAttribute("class", "related-artist-row");
+      spotifyRelArtistElement.appendChild(newRow);
+    }
 
-      for (let i = 0; i < resLen; i++) {
-        if (i % imgNumberPerRow == 0) {
-          newRow = document.createElement("div");
-          newRow.setAttribute("id", "related-artist-row-" + i);
-          newRow.setAttribute("class", "related-artist-row");
-          spotifyRelArtistElement.appendChild(newRow);
-        }
+    let imgContainer = document.createElement("div");
+    imgContainer.setAttribute("class", "related-artist-image-div");
 
-        let imgContainer = document.createElement("div");
-        imgContainer.setAttribute("class", "related-artist-image-div");
+    let relArtImg = document.createElement("img");
+    relArtImg.setAttribute("id", "rel-artist-img-" + i);
+    relArtImg.setAttribute("class", "rounded-circle related-artist-image");
+    relArtImg.setAttribute("width", "60");
+    relArtImg.setAttribute("height", "60");
+    relArtImg.src = relArtists[i].image;
+    relArtImg.innerHTML = relArtists[i].name + " image";
 
-        let relArtImg = document.createElement("img");
-        relArtImg.setAttribute("id", "rel-artist-img-" + i);
-        relArtImg.setAttribute("class", "rounded-circle related-artist-image");
-        relArtImg.setAttribute("width", "60");
-        relArtImg.setAttribute("height", "60");
-        relArtImg.src = resJSON[i].image;
-        relArtImg.innerHTML = resJSON[i].name + " image";
+    let relArtLabel = document.createElement("div");
+    relArtLabel.setAttribute("class", "related-artist-image-label");
+    relArtLabel.innerHTML = relArtists[i].name;
 
-        let relArtLabel = document.createElement("div");
-        relArtLabel.setAttribute("class", "related-artist-image-label");
-        relArtLabel.innerHTML = resJSON[i].name;
-
-        imgContainer.appendChild(relArtImg);
-        imgContainer.appendChild(relArtLabel);
-        newRow.appendChild(imgContainer);
-      }
-    });
+    imgContainer.appendChild(relArtImg);
+    imgContainer.appendChild(relArtLabel);
+    newRow.appendChild(imgContainer);
+  }
 }
 
 function onCloseNodeModal(spotifyModalElement) {
@@ -363,8 +340,6 @@ function renderCluster(targetNodeId, relatedArtists) {
         y: targetNode.y
       });
 
-      //console.log(relatedArtists[i].name + " : " + relatedArtists[i].spotifyId);
-
       edges.add({ from: targetNodeId, to: lastNodeId + 1 });
       nodeIds.push(lastNodeId + 1);
     }
@@ -402,7 +377,6 @@ function clearNetwork() {
 }
 
 function createNode(artistsData, Xo, Yo) {
-  let relArtLeng = Object.keys(artistsData.relatedArtists).length;
   let lastNodeId;
   if (nodeIds.length > 0) {
     lastNodeId = nodeIds[nodeIds.length - 1];
@@ -411,17 +385,17 @@ function createNode(artistsData, Xo, Yo) {
   }
 
   // checks the entire network for an identical node
-  let mainArtistNodeId = null;
+  let mainArtistNode = null;
 
   for (let j = 0; j <= lastNodeId; j++) {
     if (network.body.nodes[j].options.artistId == artistsData.artist.id) {
-      mainArtistNodeId = network.body.nodes[j].options.id;
+      mainArtistNode = network.body.nodes[j];
       break;
     }
   }
 
   // if node does not already exists in network
-  if (!mainArtistNodeId) {
+  if (!mainArtistNode) {
     nodes.add({
       id: lastNodeId + 1,
       shape: "circularImage",
@@ -441,7 +415,12 @@ function createNode(artistsData, Xo, Yo) {
     });
     nodeIds.push(lastNodeId + 1);
     renderCluster(lastNodeId + 1, artistsData.relatedArtists);
-  } else {
-    renderCluster(mainArtistNodeId, artistsData.relatedArtists);
+  } 
+  
+  // if it exists, then we just create the relevant nodes around it
+  else {
+    if(!mainArtistNode.options.membersCreated){
+      renderCluster(mainArtistNode.options.id, artistsData.relatedArtists);
+    }
   }
 }

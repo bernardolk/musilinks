@@ -15,18 +15,6 @@ const express = require("express"),
 main();
 
 async function main() {
-  // get's authentication token
-  //token = await require("./authentication").catch(error => console.log(error));
-  //console.log(token);
-
-  // spotifyGetParams = {
-  //   method: "GET",
-  //   headers: {
-  //     Authorization: "Bearer " + token
-  //   },
-  //   mode: "cors",
-  //   cache: "default"
-  // };
 
   const app = express();
 
@@ -53,48 +41,8 @@ async function main() {
   });
 
   app.post("/search", jsonParser, async function(req, res) {
-    //let search = await searchSpotify(req.body["search-text"]);
     let search = await searchMusicbrainz(req.body["search-text"]);
     res.json(search);
-  });
-
-  app.post("/related", jsonParser, async function(req, res) {
-    let spotifyId = req.body["artist-spotify-id"];
-    let relArtists = await getRelatedArtists(spotifyId);
-    let response = {};
-
-    let relLength = relArtists.artists.length;
-    for (let i = 0; i < relLength; i++) {
-      response[i] = {
-        name: relArtists.artists[i].name,
-        spotifyId: relArtists.artists[i].id,
-        genres: relArtists.artists[i].genres,
-        image: "notfound.jpg"
-      };
-      if (relArtists.artists[i].images.length > 0) {
-        response[i].image = relArtists.artists[i].images[0].url;
-      }
-    }
-
-    res.json(response);
-  });
-
-  // Route when user clicks in 'add' button
-  app.post("/add", jsonParser, async function(req, res) {
-    let artistName = req.body["artist-name"];
-    let spotifySearch = await quickSearchSpotify(artistName);
-    if (spotifySearch.artists.items.length > 0) {
-      let artistSpotifyId = spotifySearch.artists.items[0].id;
-      let artistInfo = await getArtistInfo(artistSpotifyId);
-      if (artistInfo.images.length > 1) {
-        //console.log(artistInfo.images[0].url);
-        res.json({ image: artistInfo.images[0].url });
-      } else {
-        res.json({ image: "notfound.jpg" });
-      }
-    } else {
-      res.json({ image: "notfound.jpg" });
-    }
   });
 
   http.createServer(app).listen(app.get("port"), function() {
@@ -102,67 +50,42 @@ async function main() {
   });
 }
 
-//---------------------------
-// SPOTIFY API Fetch Functions
-//---------------------------
-function getRelatedArtists(artistId) {
-  let BASE_URL = "https://api.spotify.com/v1/artists/";
-  let FETCH_URL = BASE_URL + artistId + "/related-artists";
 
-  return fetch(FETCH_URL, spotifyGetParams)
-    .then(function(response) {
-      return response.json();
-    })
-    .then(function(resJSON) {
-      return resJSON;
-    });
-}
+// function searchSpotify(searchInput) {
+//   let BASE_URL = "https://api.spotify.com/v1/search?";
+//   let FETCH_URL =
+//     BASE_URL + "q=" + encodeURIComponent(searchInput) + "&type=artist";
 
-function getArtistInfo(artistId) {
-  let BASE_URL = "https://api.spotify.com/v1/artists/";
-  let FETCH_URL = BASE_URL + artistId;
+//   let searchResult = {};
 
-  return fetch(FETCH_URL, spotifyGetParams).then(function(res) {
-    return res.json();
-  });
-}
+//   console.log("Search input >> " + searchInput);
+//   console.log("URI >> " + FETCH_URL);
 
-function searchSpotify(searchInput) {
-  let BASE_URL = "https://api.spotify.com/v1/search?";
-  let FETCH_URL =
-    BASE_URL + "q=" + encodeURIComponent(searchInput) + "&type=artist";
+//   return fetch(FETCH_URL, spotifyGetParams)
+//     .then(function(res) {
+//       return res.json();
+//     })
+//     .then(function(resJSON) {
+//       if (resJSON.artists.items.length > 0) {
+//         let displayLength = resJSON.artists.items.length;
+//         if (displayLength > 4) {
+//           displayLength = 5;
+//         }
 
-  let searchResult = {};
-
-  console.log("Search input >> " + searchInput);
-  console.log("URI >> " + FETCH_URL);
-
-  return fetch(FETCH_URL, spotifyGetParams)
-    .then(function(res) {
-      return res.json();
-    })
-    .then(function(resJSON) {
-      //console.log(responseJSON);
-      if (resJSON.artists.items.length > 0) {
-        let displayLength = resJSON.artists.items.length;
-        if (displayLength > 4) {
-          displayLength = 5;
-        }
-
-        for (let i = 0; i < displayLength; i++) {
-          searchResult[i] = {
-            name: resJSON.artists.items[i].name,
-            id: resJSON.artists.items[i].id
-          };
-        }
-      }
-      return searchResult;
-    })
-    .catch(function(error) {
-      console.log(error);
-      //reject(error);
-    });
-}
+//         for (let i = 0; i < displayLength; i++) {
+//           searchResult[i] = {
+//             name: resJSON.artists.items[i].name,
+//             id: resJSON.artists.items[i].id
+//           };
+//         }
+//       }
+//       return searchResult;
+//     })
+//     .catch(function(error) {
+//       console.log(error);
+//       //reject(error);
+//     });
+// }
 
 //----------------------------------
 // MUSICBRAINZ API Fetch Functions

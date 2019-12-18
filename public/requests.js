@@ -93,67 +93,83 @@ var getArtistInfo = async function(artistId) {
     }
 
     // get artist image for all identified artists.
+    console.log('TOTAL ARTISTS > ' + artistsSpotifyIds.length);
+
     if (artistsSpotifyIds.length > 0) {
-      let artistsInfo = await getSeveralArtists(artistsSpotifyIds).then(
-        function(artistsInfo) {
-          // associate spotify information in the response object.
-          for (let j = 0; j < response.relations.length; j++) {
-            for (let i = 0; i < artistsInfo.artists.length - 1; i++) {
-              if (
-                artistsInfo.artists[i].id == response.relations[j].spotify.id
-              ) {
-                if (artistsInfo.artists[i].images.length > 0) {
-                  response.relations[j].spotify.image =
-                    artistsInfo.artists[i].images[0].url;
+
+      let spotifyRoundtrips = Math.ceil(artistsSpotifyIds.length / 50);
+      console.log('CALCULATED ROUNDTRIPS > ' + spotifyRoundtrips);
+
+      for(let r = 1; r <= spotifyRoundtrips; r++){
+        let fetchCeiling = artistsSpotifyIds.length < r * 50 ? artistsSpotifyIds.length : r * 50; 
+        let artistsToFetch = artistsSpotifyIds.slice((r-1) * 50, fetchCeiling);
+        console.log('TOTAL ROUNDTRIP LENGTH > ' + artistsToFetch.length);
+        let artistsInfo = await getSeveralArtists(artistsToFetch).then(
+          function(artistsInfo) {
+            // associate spotify information in the response object.
+            for (let j = 0; j < response.relations.length; j++) {
+              for (let i = 0; i < artistsInfo.artists.length - 1; i++) {
+                if(artistsInfo.artists[i] != null){
+                  if(artistsInfo.artists[i].id == response.relations[j].spotify.id) {
+                    if (artistsInfo.artists[i].images.length > 0) {
+                      response.relations[j].spotify.image =
+                        artistsInfo.artists[i].images[0].url;
+                    }
+                    break;
+                  }
                 }
-                break;
               }
             }
-          }
 
-          let mainArtistInfo =
-            artistsInfo.artists[artistsInfo.artists.length - 1];
-          if (mainArtistInfo.images.length > 0) {
-            response.image = mainArtistInfo.images[0].url;
-          } else {
+            let mainArtistInfo =
+              artistsInfo.artists[artistsInfo.artists.length - 1];
+            if(mainArtistInfo != null){
+            if (mainArtistInfo.images.length > 0) {
+              response.image = mainArtistInfo.images[0].url;
+            } else {
+              response.image = "notfound.jpg";
+            }
+          }else{
             response.image = "notfound.jpg";
           }
         }
-      );
+        );
+
     }
+  }
 
-    // Main artist attributes
-    response.name = artistData.name;
-    response.id = artistData.id;
-    response.type = artistData.type;
-    response.description = artistData.disambiguation;
+  // Main artist attributes
+  response.name = artistData.name;
+  response.id = artistData.id;
+  response.type = artistData.type;
+  response.description = artistData.disambiguation;
 
-    let finalResponse = { artist: {}, relatedArtists: {} };
+  let finalResponse = { artist: {}, relatedArtists: {} };
 
-    // Related artist's data
-    let relationsLength = response.relations.length;
-    let resCounter = 0;
-    for (let i = 0; i < relationsLength; i++) {
-      if (response.relations[i].type == "member of band") {
-        finalResponse.relatedArtists[resCounter] = {
-          name: response.relations[i].artist.name,
-          id: response.relations[i].artist.id,
-          image: response.relations[i].spotify.image,
-          spotifyId: response.relations[i].spotify.id
-        };
-        resCounter++;
-      }
+  // Related artist's data
+  let relationsLength = response.relations.length;
+  let resCounter = 0;
+  for (let i = 0; i < relationsLength; i++) {
+    if (response.relations[i].type == "member of band") {
+      finalResponse.relatedArtists[resCounter] = {
+        name: response.relations[i].artist.name,
+        id: response.relations[i].artist.id,
+        image: response.relations[i].spotify.image,
+        spotifyId: response.relations[i].spotify.id
+      };
+      resCounter++;
     }
+  }
 
-    // Main artist's data
-    finalResponse.artist = {
-      name: response.name,
-      id: response.id,
-      image: response.image,
-      spotifyId: response.spotifyId
-    };
+  // Main artist's data
+  finalResponse.artist = {
+    name: response.name,
+    id: response.id,
+    image: response.image,
+    spotifyId: response.spotifyId
+  };
 
-    return finalResponse;
+  return finalResponse;
   } else {
     console.log("Error in fetch from MB server");
   }
@@ -261,3 +277,32 @@ async function searchArtists(searchInput){
     });
 
 }
+
+
+
+//-----------------------------
+// SPOTIFY API Fetch Functions
+//-----------------------------
+function getRelatedArtists(artistId) {
+  let BASE_URL = "https://api.spotify.com/v1/artists/";
+  let FETCH_URL = BASE_URL + artistId + "/related-artists";
+
+  return fetch(FETCH_URL, spotifyGetParams)
+    .then(function(response) {
+      return response.json();
+    })
+    .then(function(resJSON) {
+      return resJSON;
+    });
+}
+
+function getSpotifyArtistInfo(artistId) {
+  let BASE_URL = "https://api.spotify.com/v1/artists/";
+  let FETCH_URL = BASE_URL + artistId;
+
+  return fetch(FETCH_URL, spotifyGetParams).then(function(res) {
+    return res.json();
+  });
+}
+
+
