@@ -47,14 +47,9 @@
     font-size: 22px;
     padding: 0;
   }
-  .modal__spotifyarea{
-    position:relative;
-    border: 2px solid green;
-    max-height: 40%;
-  }
+  
   body {
     font: 10pt arial;
-    height: 100%;
     overflow: hidden;
   }
   #mynetwork {
@@ -74,13 +69,11 @@
     box-shadow: 0 3px 2px rgba(0, 0, 0, 0.3);
   }
 
-  .related-artist-image{
-    float: right;
-  }
+ 
 
   .loader {
-    border: 16px solid #1b2b757a; /* Light grey */
-    border-top: 16px solid #0f9e46; /* Blue */
+    border: 16px solid #1b2b757a;
+    border-top: 16px solid #0f9e46;
     border-radius: 50%;
     width: 120px;
     height: 120px;
@@ -91,7 +84,6 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
   }
-
 
 /**************************\
   Basic Modal Styles
@@ -114,7 +106,7 @@
   }
   
   .modal__container {
-    background-color: #fff;
+    background-color: #1a2636;
     padding: 30px;
     max-width: 700px;
     max-height: 80vh;
@@ -133,9 +125,9 @@
     margin-top: 0;
     margin-bottom: 0;
     font-weight: 600;
-    font-size: 1.25rem;
+    font-size: 2rem;
     line-height: 1.25;
-    color: #00449e;
+    color: #3bb94c;
     box-sizing: border-box;
   }
   
@@ -143,15 +135,7 @@
     background-color: #d4d4d4;
     border: 0;
   }
-  
-  .modal__header .modal__close:before { content: "\2715"; }
-  
-  .modal__content {
-    margin-top: 2rem;
-    margin-bottom: 2rem;
-    line-height: 1.5;
-    color: rgba(0,0,0,.8);
-  }
+
   
   .modal__btn {
     font-size: .875rem;
@@ -191,6 +175,105 @@
     color: #fff;
   }
   
+  .modal__header .modal__close:before { content: "\2715"; }
+  
+  .modal__content {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    line-height: 1.5;
+    max-height: 60%;
+    color: rgba(0,0,0,.8);
+  }
+
+
+/**************************\
+  Scroll bar
+\**************************/
+
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1; 
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888; 
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555; 
+}
+
+
+/**************************\
+  Node modal styles
+\**************************/
+
+ /* .modal__spotifyarea{
+    position:relative;
+    border: 2px solid green;
+  }*/
+
+  .modal__spotify__player{
+    float: left;
+  }
+
+  .modal__spotify__related_artists{
+    position: relative;
+    float: right;
+    max-width: 50%;
+    max-height: 55vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-sizing: border-box;
+    text-align: center;
+    background-color: #0f151b;
+    background-image: linear-gradient(#151b22, #0e4415);
+  }
+
+  .modal__spotify__related_artists h3{
+    color: #3bb94c;
+    background-color: #0e1822;
+    font-size: 1.5rem;
+    padding: 10px;
+    position: sticky;
+    /*background-color: #151b22;*/  
+  }
+
+  .related-artist-row{
+    display: inline-block;
+  }
+
+  .related-artist-image-div{
+    float: left;
+    text-align: center;
+    max-width: 70px;
+  }
+
+  .related-artist-image{
+    margin-top: 12px;
+    margin-left: 6px;
+    margin-right: 12px;
+  }
+
+  .related-artist-image-label{
+    margin-top: 8px;
+    color: #ffffff;
+    word-wrap: break-word;
+    float: bottom;
+  }
+
+  
+/**************************\
+  Main Modal Styles
+\**************************/
+
   .main__modal__container {
     background-color: #1a2636;
     padding: 30px;
@@ -202,7 +285,6 @@
     overflow-y: auto;
     box-sizing: border-box;
   }
-
   .main__modal__title {
     margin-top: 30px;
     margin-bottom: 0;
@@ -211,7 +293,7 @@
     line-height: 1.25;
     text-align: center;
     color: #3bb94c;
-    text-shadow: -4px 0 0 #ffffffea, -4px 0 0 #ffffffea, 0 4px 0 #ffffffea, 0 -4px 0 #ffffffea;
+    text-shadow: -4px 0 0 #000000ea, -4px 0 0 #000000ea, 0 4px 0 #000000ea, 0 -4px 0 #000000ea;
     font-family: monospace;
     box-sizing: border-box;
   }

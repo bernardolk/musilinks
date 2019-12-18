@@ -30,36 +30,12 @@
       type="text/javascript"
       src="https://unpkg.com/micromodal/dist/micromodal.min.js"
     ></script>
-
-    <!-- <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="#">Musilinks</a>
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-toggle="collapse"
-        data-target="#navbarSupportedContent"
-        aria-controls="navbarSupportedContent"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <form class="form-inline my-2 my-lg-0" autocomplete="off">
-          <input
-            class="form-control mr-sm-2"
-            type="search"
-            placeholder="Search music"
-            aria-label="Search"            
-          />
-        </form>
-      </div>
-    </nav> -->
   </head>
 
   <body>
     <!-- Network -->
     <div id="mynetwork"></div>
+
     <!-- Artist's information dialog modal -->
     <div class="modal micromodal-slide" id="modal-1" aria-hidden="true">
       <div class="modal__overlay" tabindex="-1" data-micromodal-close>
@@ -80,12 +56,12 @@
             ></button>
           </header>
           <main class="modal__content" id="modal-1-content">
-            <div class="modal__spotifyarea" id="modal-1-spotify"></div>
-            <p>
-              Try hitting the <code>tab</code> key and notice how the focus
-              stays within the modal itself. Also, <code>esc</code> to close
-              modal.
-            </p>
+            <!-- <div class="modal__spotifyarea" id="modal-1-spotify"> -->
+              <div class="modal__spotify__player" id="modal-1-player"></div>
+              <div class="modal__spotify__related_artists" id="modal-1-related">
+                <h3>Related Artists</h3>
+              </div>
+            <!-- </div> -->
           </main>
           <footer class="modal__footer">
             <button class="modal__btn modal__btn-primary">Continue</button>
@@ -138,7 +114,9 @@
       </div>
     </div>
 
-    <script src="events.js"></script>
+    <script src="bundle.js"></script>
+    <script src="requests.js"></script>
+    <!-- <script src="events.js"></script> -->
     <script
       src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
       integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"

@@ -46,14 +46,11 @@ const releasedNodeOptions = {
   font: { size: parentFontSize }
 };
 
-
 // Initializes the micromodal instance
 MicroModal.init();
 
-
 // Called when the Visualization API is loaded.
 function startNetwork(artistsData) {
-  
   let maxRepulsionMode = false;
   nodeIds = [];
   nodes = new vis.DataSet();
@@ -121,7 +118,7 @@ function startNetwork(artistsData) {
     });
   });
 
-  network.on("dragEnd", function(params) {
+  network.on("dragEnd", async function(params) {
     if (params.nodes.length > 0 && params.edges.length > 0) {
       let releasedNodeId = params.nodes[0];
       let releasedNode = network.body.nodes[releasedNodeId];
@@ -143,21 +140,10 @@ function startNetwork(artistsData) {
 
           releasedNode.setOptions(releasedNodeOptions);
 
-          let showParams = {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({ "artist-id": artistId })
-          };
+          let artistData = await getArtistInfo(artistId);
 
-          // send request for artist's related artists
-          fetch("/show", showParams)
-            .then(function(res) {
-              return res.json();
-            })
-            .then(function(resJSON) {
-              releasedNode.setOptions({ borderWidth: defaultBorderWidth });
-              renderCluster(releasedNodeId, resJSON.relatedArtists);
-            });
+          releasedNode.setOptions({ borderWidth: defaultBorderWidth });
+          renderCluster(releasedNodeId, artistData.relatedArtists);
         }
       }
     }
@@ -250,7 +236,7 @@ function openNodeModal(params) {
 
   console.log("SPOTIFY ID: " + selectedNode.options.spotifyId);
 
-  let spotifyModalElement = document.getElementById("modal-1-spotify");
+  let spotifyModalElement = document.getElementById("modal-1-player");
   let player = document.createElement("iframe");
   player.id = "spotify-player";
   player.src =
@@ -276,6 +262,8 @@ function openNodeModal(params) {
     })
   };
 
+  let spotifyRelArtistElement = document.getElementById("modal-1-related");
+
   fetch("/related", relatedParams)
     .then(function(res) {
       return res.json();
@@ -283,26 +271,49 @@ function openNodeModal(params) {
     .then(function(resJSON) {
       let resLen = Object.keys(resJSON).length;
       console.log(resLen);
+
+      let imgNumberPerRow = 4;
+      let newRow;
+
       for (let i = 0; i < resLen; i++) {
+        if (i % imgNumberPerRow == 0) {
+          newRow = document.createElement("div");
+          newRow.setAttribute("id", "related-artist-row-" + i);
+          newRow.setAttribute("class", "related-artist-row");
+          spotifyRelArtistElement.appendChild(newRow);
+        }
+
+        let imgContainer = document.createElement("div");
+        imgContainer.setAttribute("class", "related-artist-image-div");
+
         let relArtImg = document.createElement("img");
         relArtImg.setAttribute("id", "rel-artist-img-" + i);
         relArtImg.setAttribute("class", "rounded-circle related-artist-image");
         relArtImg.setAttribute("width", "60");
         relArtImg.setAttribute("height", "60");
         relArtImg.src = resJSON[i].image;
-        spotifyModalElement.appendChild(relArtImg);
+        relArtImg.innerHTML = resJSON[i].name + " image";
+
+        let relArtLabel = document.createElement("div");
+        relArtLabel.setAttribute("class", "related-artist-image-label");
+        relArtLabel.innerHTML = resJSON[i].name;
+
+        imgContainer.appendChild(relArtImg);
+        imgContainer.appendChild(relArtLabel);
+        newRow.appendChild(imgContainer);
       }
     });
 }
 
 function onCloseNodeModal(spotifyModalElement) {
   spotifyModalElement.removeChild(document.getElementById("spotify-player"));
-  let relArtists = spotifyModalElement.getElementsByClassName("rounded-circle");
-  let relLen = relArtists.length;
-  //console.log(relArtists);
-  for (let i = 0; i < relLen; i++) {
-    relArtists[0].parentNode.removeChild(relArtists[0]);
-    //console.log(i + "/" + relLen);
+
+  let relArtists = Array.from(
+    document.getElementsByClassName("related-artist-row")
+  );
+  let target = document.getElementById("modal-1-related");
+  for (let i = 0; i < relArtists.length; i++) {
+    target.removeChild(relArtists[i]);
   }
 }
 

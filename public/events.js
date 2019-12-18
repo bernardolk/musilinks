@@ -1,20 +1,53 @@
+const debounce = require("lodash.debounce");
+
+// Control variables
 var ghostNodeClick = false;
 var ghostNodeHolder = null;
-
 var mainModalOpen = false;
-var searchInputElement = document.getElementById("search-bar-text");
+
+// ---------------------------------------------
+//             authenticate client
+// ---------------------------------------------
+var spotifyToken;
+
+getSpotifyToken();
+async function getSpotifyToken() {
+  spotifyToken = await fetch("/token").then(function(res) {
+    return res.text();
+  });
+
+  spotifyGetParams = {
+    method: "GET",
+    headers: {
+      Authorization: "Bearer " + spotifyToken
+    },
+    mode: "cors",
+    cache: "default"
+  };
+}
+
+// ---------------------------------------------
+//             modal controls
+// ---------------------------------------------
 
 MicroModal.show("main-modal");
 
-//MicroModal.show('loading-modal');
+function showLoader() {MicroModal.show("loading-modal");}
+function closeLoader() {MicroModal.close("loading-modal");}
 
-function showLoader() {
-  MicroModal.show("loading-modal");
-}
 
-function closeLoader() {
-  MicroModal.close("loading-modal");
-}
+const onMainModalClose = function() {
+  mainModalOpen = false;
+  searchBar.value = "";
+};
+
+const onMainModalShow = function() {
+  mainModalOpen = true;
+};
+
+// ---------------------------------------------
+//               document events
+// ---------------------------------------------
 
 document.onkeypress = function(e) {
   e = e || window.event;
@@ -27,25 +60,6 @@ document.onkeypress = function(e) {
   }
 };
 
-// document.onkeydown = function(e) {
-//   e = e || window.event;
-//   let keyCode = e.keyCode;
-//   if (keyCode == 8) {
-//     console.log("yay");
-//     keyInput = keyInput.slice(0, -1);
-//     //console.log(keyInput);
-//     searchInputElement.value = keyInput;
-//   }
-// };
-
-const onMainModalClose = function() {
-  mainModalOpen = false;
-  searchBar.value = "";
-};
-
-const onMainModalShow = function() {
-  mainModalOpen = true;
-};
 
 document.body.addEventListener("mousemove", function(e) {
   mouseX = e.clientX - bounds.left;
@@ -71,233 +85,77 @@ document.body.addEventListener("mousemove", function(e) {
 
       showLoader();
 
-      let params = {
-        method: "POST",
-        headers: {
-          "content-type": "application/json"
-        },
-        body: JSON.stringify({ "artist-id": clickedArtistId })
-      };
-
       document.body.removeEventListener("click", ghostNodeClickHandler);
 
       ghostNodeClick = false;
       ghostNodeHolder = null;
-    
-      fetch("/show", params)
-        .then(function(response) {
-          return response.json();
-        })
-        .then(function(resJSON) {
-          closeLoader();
-          createNode(resJSON, canvasCoords.x, canvasCoords.y);
-        });
     }
   }
 });
 
-// ------------ SEARCH BAR ---------------- //
+// ---------------------------------------------
+//                autocomplete
+// ---------------------------------------------
 
+//Apply event listeners
 const searchBar = document.getElementById("search-bar");
+var searchInput;
 autocomplete(searchBar);
 
-//var showSearchItems = true;
-var currentInput;
+let debouncedSearch = 
+    debounce(async function() {    
+      let artistList = await searchArtists(searchInput);
+      
+      let acContainerElmnt = document.createElement("DIV");
+      acContainerElmnt.setAttribute("id", searchBar.id + "autocomplete-list");
+      acContainerElmnt.setAttribute("class", "autocomplete-items");
+      document.getElementById("main-form").appendChild(acContainerElmnt);
 
-function autocomplete(inp) {
+      // construct list of artist search results
+      for (let i = 0; i < Object.keys(artistList).length; i++) {
+        let acItemElmnt = document.createElement("DIV");
+        if (artistList[i].description) {
+          acItemElmnt.innerHTML =
+            artistList[i].name + " - <i>" + artistList[i].description + "</i>";
+        } else {
+          acItemElmnt.innerHTML = artistList[i].name;
+        }
+        acItemElmnt.innerHTML +=
+          "<input type='hidden' value='" +
+          artistList[i].name +
+          "' data-artistid='" +
+          artistList[i].id +
+          "'>";
+
+        // Creates 'add' button
+        let acAddBtnElmnt = document.createElement("button");
+        acAddBtnElmnt.setAttribute("class", "btn btn-success btn-lg  autocomplete-btn");
+        acAddBtnElmnt.innerHTML = "+";
+        acItemElmnt.appendChild(acAddBtnElmnt);
+        acAddBtnElmnt.addEventListener("click", e => onClickAddItem(e));  // On 'add' button click  
+        acItemElmnt.addEventListener("click", e => onClickItem(e)); // On search item click
+        acContainerElmnt.appendChild(acItemElmnt);
+      }
+    }, 900);
+
+function autocomplete(searchBar) {
   let currentFocus;
 
   // listen for user input in the search bar
-  inp.addEventListener("input", function(e) {
-    let a, b, i; // Input tags value:
-    let inputVal = e.target.value;
-    currentInput = inputVal;
-
-    closeAllLists();
-
+  searchBar.addEventListener("input", function(e) {
+    searchInput = e.target.value;
     currentFocus = -1;
 
-    // checks to see if this call is outdated based on current user input
-    if (currentInput === inputVal) {
-      let fetchParams = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ "search-text": inputVal })
-      };
+    closeAllLists();
+    console.log("you are typing");
+    let args = [{'searchInput' : searchInput}];
+    debouncedSearch.bind(searchBar);
+    debouncedSearch();
 
-      fetch("/search", fetchParams)
-        .then(response => {
-          return response.json();
-        })
-        .then(artists => {
-          let jsonLength = Object.keys(artists).length;
-
-          // only display results if we have a valid response AND
-          // the current value of the input is equal to the input we
-          // are calculating (this avoids problems with assynchronous calls)
-          if (jsonLength > 0 && inputVal === currentInput) {
-            a = document.createElement("DIV");
-            a.setAttribute("id", this.id + "autocomplete-list");
-            a.setAttribute("class", "autocomplete-items");
-            document.getElementById("main-form").appendChild(a);
-
-            for (i = 0; i < jsonLength; i++) {
-              b = document.createElement("DIV");
-              if (artists[i].description) {
-                b.innerHTML =
-                  artists[i].name + " - <i>" + artists[i].description + "</i>";
-              } else {
-                b.innerHTML = artists[i].name;
-              }
-              b.innerHTML +=
-                "<input type='hidden' value='" +
-                artists[i].name +
-                "' data-artistid='" +
-                artists[i].id +
-                "'>";
-
-              // Creates 'add' button
-              c = document.createElement("button");
-              c.setAttribute(
-                "class",
-                "btn btn-success btn-lg  autocomplete-btn"
-              );
-              c.innerHTML = "+";
-              b.appendChild(c);
-
-              // On 'add' button click
-              c.addEventListener("click", function(e) {
-                e.stopPropagation();
-
-                closeAllLists();
-
-                MicroModal.close("main-modal");
-
-                let clickedArtistId = this.parentNode
-                  .getElementsByTagName("input")[0]
-                  .getAttribute("data-artistid");
-                let clickedArtistName = this.parentNode.getElementsByTagName(
-                  "input"
-                )[0].value;
-
-                // Get artist image from spotify to render node
-                if (network == null) {
-                  let params = {
-                    method: "POST",
-                    headers: {
-                      "content-type": "application/json"
-                    },
-                    body: JSON.stringify({ "artist-id": clickedArtistId })
-                  };
-
-                  // Loading animation
-                  showLoader();
-
-                  console.time("show");
-                fetch("/show", params)
-                  .then(function(response) {
-                    return response.json();
-                  })
-                  .then(function(resJson) {
-                    console.time("show");
-                    // deletes the network and restarts it with the newly selected artist's data
-                    console.time("render");
-                    closeLoader();
-                    clearNetwork();
-                    startNetwork(resJson);
-                    console.time("render");
-                  });
-                } else {
-                  // Pass selected artist information to server to render node
-                  let params = {
-                    method: "POST",
-                    headers: {
-                      "content-type": "application/json"
-                    },
-                    body: JSON.stringify({
-                      "artist-id": clickedArtistId,
-                      "artist-name": clickedArtistName
-                    })
-                  };
-
-                  fetch("/add", params)
-                    .then(function(res) {
-                      return res.json();
-                    })
-                    .then(function(resJSON) {
-                      ghostNodeHolder = document.createElement("img");
-                      ghostNodeHolder.setAttribute("id", "ghostNode");
-                      ghostNodeHolder.setAttribute(
-                        "class",
-                        "ghost-node rounded-circle"
-                      );
-                      ghostNodeHolder.setAttribute(
-                        "width",
-                        320 * network.getScale()
-                      );
-                      ghostNodeHolder.setAttribute(
-                        "height",
-                        320 * network.getScale()
-                      );
-                      ghostNodeHolder.src = resJSON["image"];
-                      ghostNodeHolder.setAttribute(
-                        "data-artistId",
-                        clickedArtistId
-                      );
-                      document.body.appendChild(ghostNodeHolder);
-                    });
-                }
-              });
-
-              b.addEventListener("click", function(e) {
-                console.log("Network restarting...");
-                MicroModal.close("main-modal");
-                let params = {
-                  method: "POST",
-                  headers: {
-                    "content-type": "application/json"
-                  },
-                  body: JSON.stringify({
-                    "artist-id": encodeURIComponent(
-                      this.getElementsByTagName("input")[0].getAttribute(
-                        "data-artistid"
-                      )
-                    )
-                  })
-                };
-                closeAllLists();
-
-                showLoader();
-
-                console.time("show");
-                fetch("/show", params)
-                  .then(function(response) {
-                    return response.json();
-                  })
-                  .then(function(resJson) {
-                    console.time("show");
-                    // deletes the network and restarts it with the newly selected artist's data
-                    console.time("render");
-                    closeLoader();
-                    clearNetwork();
-                    startNetwork(resJson);
-                    console.time("render");
-                  });
-              });
-
-              a.appendChild(b);
-            }
-          } else {
-            //console.log("oh no");
-          }
-        });
-    }
   });
 
   /*execute a function presses a key on the keyboard:*/
-  inp.addEventListener("keydown", function(e) {
+  searchBar.addEventListener("keydown", function(e) {
     // gets the list
     let x = document.getElementById(this.id + "autocomplete-list");
     // if we do have a list...
@@ -343,17 +201,96 @@ function autocomplete(inp) {
     }
   }
 
-  function closeAllLists(elmnt) {
-    let x = document.getElementsByClassName("autocomplete-items");
-    for (let i = 0; i < x.length; i++) {
-      if (elmnt != x[i] && elmnt != inp) {
-        x[i].parentNode.removeChild(x[i]);
-      }
-    }
-  }
-
   /*execute a function when someone clicks in the document:*/
   document.addEventListener("click", function(e) {
     closeAllLists(e.target);
   });
+}
+
+async function onClickItem(e) {
+  e.stopPropagation();
+  console.log("Network restarting...");
+  let artistId = e.target
+    .getElementsByTagName("input")[0]
+    .getAttribute("data-artistid");
+
+  MicroModal.close("main-modal");
+
+  closeAllLists();
+  showLoader();
+
+  let resJSON = await getArtistInfo(artistId);
+
+  closeLoader();
+  clearNetwork();
+  startNetwork(resJSON);
+}
+
+function closeAllLists() {
+  let items = document.getElementsByClassName("autocomplete-items");
+  for (let i = 0; i < items.length; i++) {
+    items[i].parentNode.removeChild(items[i]);
+  }
+}
+
+async function onClickAddItem(e) {
+  e.stopPropagation();
+
+  closeAllLists();
+
+  MicroModal.close("main-modal");
+
+  let clickedArtistId = this.parentNode
+    .getElementsByTagName("input")[0]
+    .getAttribute("data-artistid");
+  let clickedArtistName = this.parentNode.getElementsByTagName("input")[0]
+    .value;
+
+  // Get artist image from spotify to render node
+  if (network == null) {
+    // Loading animation
+    showLoader();
+
+    console.time("show");
+    fetch("/show", params)
+      .then(function(response) {
+        return response.json();
+      })
+      .then(function(resJson) {
+        console.time("show");
+        // deletes the network and restarts it with the newly selected artist's data
+        console.time("render");
+        closeLoader();
+        clearNetwork();
+        startNetwork(resJson);
+        console.time("render");
+      });
+  } else {
+    // Pass selected artist information to server to render node
+    // let params = {
+    //   method: "POST",
+    //   headers: {
+    //     "content-type": "application/json"
+    //   },
+    //   body: JSON.stringify({
+    //     "artist-id": clickedArtistId,
+    //     "artist-name": clickedArtistName
+    //   })
+    // };
+
+    fetch("/add", params)
+      .then(function(res) {
+        return res.json();
+      })
+      .then(function(resJSON) {
+        ghostNodeHolder = document.createElement("img");
+        ghostNodeHolder.setAttribute("id", "ghostNode");
+        ghostNodeHolder.setAttribute("class", "ghost-node rounded-circle");
+        ghostNodeHolder.setAttribute("width", 320 * network.getScale());
+        ghostNodeHolder.setAttribute("height", 320 * network.getScale());
+        ghostNodeHolder.src = resJSON["image"];
+        ghostNodeHolder.setAttribute("data-artistId", clickedArtistId);
+        document.body.appendChild(ghostNodeHolder);
+      });
+  }
 }
