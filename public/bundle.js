@@ -396,7 +396,10 @@ var spotifyToken;
 getSpotifyToken();
 async function getSpotifyToken() {
   spotifyToken = await fetch("/token").then(function(res) {
-    MicroModal.show("main-modal");
+    MicroModal.show("main-modal", {
+      onClose: onMainModalClose,
+      onShow: onMainModalShow
+    });
     return res.text();
   });
 
@@ -436,7 +439,7 @@ const onMainModalShow = function() {
 
 document.onkeypress = function(e) {
   e = e || window.event;
-  let charCode = typeof e.which == "number" ? e.which : e.keyCode;
+let charCode = typeof e.which == "number" ? e.which : e.keyCode;
   if (charCode && !mainModalOpen) {
     MicroModal.show("main-modal", {
       onClose: onMainModalClose,
@@ -444,6 +447,11 @@ document.onkeypress = function(e) {
     });
   }
 };
+
+document.onmousemove = function(e){
+  mouseX = e.clientX - bounds.left;
+  mouseY = e.clientY - bounds.top;
+}
 
 // ---------------------------------------------
 //                autocomplete
@@ -456,7 +464,7 @@ autocomplete(searchBar);
 
 let debouncedSearch = debounce(async function() {
   if (searchInput != "") {
-    let artistList = await searchArtists(searchInput);
+    let artistList = await searchMusicBrainzLimited(searchInput);
 
     let acContainerElmnt = document.createElement("DIV");
     acContainerElmnt.setAttribute("id", searchBar.id + "autocomplete-list");
@@ -566,10 +574,18 @@ function autocomplete(searchBar) {
 
 async function onClickItem(e) {
   e.stopPropagation();
-  let artistId = e.target
+
+  // Get artistId from clicked autocomplete item
+  // Checks if clicked on input tag or div tag
+  let artistId;
+  if(e.target.tagName.toLowerCase() == "i"){
+    artistId = e.target.parentNode.getElementsByTagName("input")[0].getAttribute("data-artistid");
+  }else{
+    artistId = e.target
     .getElementsByTagName("input")[0]
     .getAttribute("data-artistid");
-
+  }
+ 
   MicroModal.close("main-modal");
 
   closeAllLists();
@@ -648,8 +664,6 @@ async function onClickAddItem(e) {
 
 function onGhostNodeMousemove(e){
   e.stopPropagation();
-  mouseX = e.clientX - bounds.left;
-  mouseY = e.clientY - bounds.top;
 
   let nodeX = mouseX - parentNodeSize * network.getScale();
   let nodeY = mouseY - parentNodeSize * network.getScale() + bounds.top;

@@ -14,7 +14,10 @@ var spotifyToken;
 getSpotifyToken();
 async function getSpotifyToken() {
   spotifyToken = await fetch("/token").then(function(res) {
-    MicroModal.show("main-modal");
+    MicroModal.show("main-modal", {
+      onClose: onMainModalClose,
+      onShow: onMainModalShow
+    });
     return res.text();
   });
 
@@ -54,7 +57,7 @@ const onMainModalShow = function() {
 
 document.onkeypress = function(e) {
   e = e || window.event;
-  let charCode = typeof e.which == "number" ? e.which : e.keyCode;
+let charCode = typeof e.which == "number" ? e.which : e.keyCode;
   if (charCode && !mainModalOpen) {
     MicroModal.show("main-modal", {
       onClose: onMainModalClose,
@@ -79,7 +82,7 @@ autocomplete(searchBar);
 
 let debouncedSearch = debounce(async function() {
   if (searchInput != "") {
-    let artistList = await searchArtists(searchInput);
+    let artistList = await searchMusicBrainzLimited(searchInput);
 
     let acContainerElmnt = document.createElement("DIV");
     acContainerElmnt.setAttribute("id", searchBar.id + "autocomplete-list");

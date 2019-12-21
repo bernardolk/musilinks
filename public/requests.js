@@ -200,7 +200,7 @@ function getSeveralArtists(artistsIds) {
 }
 
 
-async function searchArtists(searchInput){
+async function searchMusicBrainzLimited(searchInput){
   let BASE_URL = "https://musicbrainz.org/ws/2/";
   let FETCH_URL =
     BASE_URL +
@@ -250,6 +250,30 @@ async function searchArtists(searchInput){
 
 }
 
+function searchMusicBrainz(query, limit){
+  let FETCH_URL = 
+  'https://musicbrainz.org/ws/2/artist?query=artist:'
+    + query + '&limit=' + limit + '&fmt=json';
+
+    
+  let mbFetchParams = {
+    method: "GET",
+    header: { "User-Agent": "Musilinks/0.1 (bernardo.knackfuss@gmail.com)" },
+    mode: "cors",
+    cache: "default"
+  };
+
+  return fetch(FETCH_URL, mbFetchParams)
+    .then(function(res){
+      return res.json();
+    })
+    .then(function(resJSON){
+      return resJSON;
+    })
+    .catch(function(error){
+      console.log(error);
+    });
+}
 
 
 //-----------------------------
