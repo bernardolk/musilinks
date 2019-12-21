@@ -65,17 +65,17 @@ var getArtistInfo = async function(artistId) {
     }
 
     // get artist image for all identified artists.
-    console.log('TOTAL ARTISTS > ' + artistsSpotifyIds.length);
+    //console.log('TOTAL ARTISTS > ' + artistsSpotifyIds.length);
 
     if (artistsSpotifyIds.length > 0) {
 
       let spotifyRoundtrips = Math.ceil(artistsSpotifyIds.length / 50);
-      console.log('CALCULATED ROUNDTRIPS > ' + spotifyRoundtrips);
+      //console.log('CALCULATED ROUNDTRIPS > ' + spotifyRoundtrips);
 
       for(let r = 1; r <= spotifyRoundtrips; r++){
         let fetchCeiling = artistsSpotifyIds.length < r * 50 ? artistsSpotifyIds.length : r * 50; 
         let artistsToFetch = artistsSpotifyIds.slice((r-1) * 50, fetchCeiling);
-        console.log('TOTAL ROUNDTRIP LENGTH > ' + artistsToFetch.length);
+        //console.log('TOTAL ROUNDTRIP LENGTH > ' + artistsToFetch.length);
         let artistsInfo = await getSeveralArtists(artistsToFetch).then(
           function(artistsInfo) {
             // associate spotify information in the response object.

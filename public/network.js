@@ -192,10 +192,10 @@ function startNetwork(artistsData) {
           // user clicked on a node and now is double clicking outside it
           let canvasCoords = network.DOMtoCanvas({ x: mouseX, y: mouseY });
   
-          highlightedNode.setOptions({
-            x: canvasCoords.x,
-            y: canvasCoords.y
-          });
+         highlightedNode.setOptions({
+           x: canvasCoords.x,
+           y: canvasCoords.y
+         });
           highlightedNode.setOptions(fixedNodeOptions);
           network.startSimulation();
         } else {

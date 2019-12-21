@@ -63,6 +63,11 @@ document.onkeypress = function(e) {
   }
 };
 
+document.onmousemove = function(e){
+  mouseX = e.clientX - bounds.left;
+  mouseY = e.clientY - bounds.top;
+}
+
 // ---------------------------------------------
 //                autocomplete
 // ---------------------------------------------
@@ -184,7 +189,7 @@ function autocomplete(searchBar) {
 
 async function onClickItem(e) {
   e.stopPropagation();
-  
+
   // Get artistId from clicked autocomplete item
   // Checks if clicked on input tag or div tag
   let artistId;
@@ -274,8 +279,6 @@ async function onClickAddItem(e) {
 
 function onGhostNodeMousemove(e){
   e.stopPropagation();
-  mouseX = e.clientX - bounds.left;
-  mouseY = e.clientY - bounds.top;
 
   let nodeX = mouseX - parentNodeSize * network.getScale();
   let nodeY = mouseY - parentNodeSize * network.getScale() + bounds.top;
