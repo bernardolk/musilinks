@@ -1,33 +1,5 @@
 var getArtistInfo = async function(artistId) {
-  //let artistId = req.body["artist-id"];
-
-  // Related artist fetch method
-  //let artistInfo = await getArtistInfo(artistId);
-  //let relatedArtists = await getRelatedArtists(artistId);
-  // let relArtLen = relatedArtists.artists.length;
-  // for (let i = 0; i < relArtLen; i++) {
-  //   if(relatedArtists.artists[i].images.length > 0){
-  //   response.relatedArtists[i] = {
-  //     name: relatedArtists.artists[i].name,
-  //     id: relatedArtists.artists[i].id,
-  //     image: relatedArtists.artists[i].images[0].url
-  //   };
-  // }else{
-  //   // if artist does not have an image
-  //   response.relatedArtists[i] = {
-  //     name: relatedArtists.artists[i].name,
-  //     id: relatedArtists.artists[i].id,
-  //     image: 'notfound.jpg'
-  //   };
-  // }
-  // }
-  // if(artistInfo.images.length > 0){
-  // response.artist = { name: artistInfo.name, id: artistInfo.id, image: artistInfo.images[0].url};
-  // }
-  // else{
-  //   response.artist = { name: artistInfo.name, id: artistInfo.id, image: 'notfound.jpg'};
-  // }
-
+  console.log("artist ID > " + artistId);
   // Fetch data from Musicbrainz
   let artistData = await getMbArtist(artistId);
 

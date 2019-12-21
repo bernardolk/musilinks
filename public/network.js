@@ -235,7 +235,10 @@ async function openNodeModal(params) {
 
   // fetch data from spotify
   let spotifyRelArtists = await getRelatedArtists(selectedNode.options.spotifyId);
-    
+
+  let relArtistsBtn = document.getElementById("spawn-rel-artists-btn");
+  relArtistsBtn.addEventListener("click", e => {onRelArtistsBtnClick(e,selectedNode);});
+
   // Creates more 'friendly' object to work with (not realy needed anymore)
   let relArtists = {};
   let relLength = spotifyRelArtists.artists.length;
@@ -267,8 +270,6 @@ async function openNodeModal(params) {
     let relArtImg = document.createElement("img");
     relArtImg.setAttribute("id", "rel-artist-img-" + i);
     relArtImg.setAttribute("class", "rounded-circle related-artist-image");
-    relArtImg.setAttribute("width", "60");
-    relArtImg.setAttribute("height", "60");
     relArtImg.src = relArtists[i].image;
     relArtImg.innerHTML = relArtists[i].name + " image";
 
@@ -282,6 +283,41 @@ async function openNodeModal(params) {
   }
 }
 
+let onRelArtistsBtnClick = async function(e, selectedNode){
+  e.stopPropagation();
+
+  let spotifyId = selectedNode.options.spotifyId;
+  let targetNodeId = selectedNode.options.id;
+
+  // Related artist fetch method
+  let relatedArtists = await getRelatedArtists(spotifyId);
+  let relArtLen = relatedArtists.artists.length;
+
+  let response = {relatedArtists:{}};
+  for (let i = 0; i < relArtLen; i++) {
+    if(relatedArtists.artists[i].images.length > 0){
+      response.relatedArtists[i] = {
+        name: relatedArtists.artists[i].name,
+        spotifyId: relatedArtists.artists[i].id,
+        id: "yeahnope",
+        image: relatedArtists.artists[i].images[0].url
+      };
+    }else{
+      // if artist does not have an image
+      response.relatedArtists[i] = {
+        name: relatedArtists.artists[i].name,
+        spotifyId: relatedArtists.artists[i].id,
+        id: "yeahnope",
+        image: 'notfound.jpg'
+      };
+    }
+  }
+
+  MicroModal.close("modal-1");
+  renderCluster(targetNodeId, response.relatedArtists);
+}
+
+
 function onCloseNodeModal(spotifyModalElement) {
   spotifyModalElement.removeChild(document.getElementById("spotify-player"));
 
@@ -292,7 +328,11 @@ function onCloseNodeModal(spotifyModalElement) {
   for (let i = 0; i < relArtists.length; i++) {
     target.removeChild(relArtists[i]);
   }
+
+  document.getElementById("spawn-rel-artists-btn").removeEventListener("click", onRelArtistsBtnClick);
+
 }
+
 
 // Create related artists nodes (cluster)
 function renderCluster(targetNodeId, relatedArtists) {

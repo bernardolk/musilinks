@@ -184,10 +184,18 @@ function autocomplete(searchBar) {
 
 async function onClickItem(e) {
   e.stopPropagation();
-  let artistId = e.target
+  
+  // Get artistId from clicked autocomplete item
+  // Checks if clicked on input tag or div tag
+  let artistId;
+  if(e.target.tagName.toLowerCase() == "i"){
+    artistId = e.target.parentNode.getElementsByTagName("input")[0].getAttribute("data-artistid");
+  }else{
+    artistId = e.target
     .getElementsByTagName("input")[0]
     .getAttribute("data-artistid");
-
+  }
+ 
   MicroModal.close("main-modal");
 
   closeAllLists();

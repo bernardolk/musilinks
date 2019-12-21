@@ -6,12 +6,12 @@
       name="viewport"
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
-    <link
+    <!-- <link
       rel="stylesheet"
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
       integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
       crossorigin="anonymous"
-    />
+    /> -->
     <link rel="stylesheet" type="text/css" href="style.css" />
     <script
       type="text/javascript"
@@ -22,10 +22,10 @@
       rel="stylesheet"
       type="text/css"
     />
-    <link
+    <!-- <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
-    />
+    /> -->
     <script
       type="text/javascript"
       src="https://unpkg.com/micromodal/dist/micromodal.min.js"
@@ -59,19 +59,12 @@
             <!-- <div class="modal__spotifyarea" id="modal-1-spotify"> -->
               <div class="modal__spotify__player" id="modal-1-player"></div>
               <div class="modal__spotify__related_artists" id="modal-1-related">
-                <h3>Related Artists</h3>
+                <div id="related-artists-header">Related Artists</div>
               </div>
             <!-- </div> -->
           </main>
           <footer class="modal__footer">
-            <button class="modal__btn modal__btn-primary">Continue</button>
-            <button
-              class="modal__btn"
-              data-micromodal-close
-              aria-label="Close this dialog window"
-            >
-              Close
-            </button>
+            <button class="modal__btn modal__btn-primary" id="spawn-rel-artists-btn">Spawn Related Artists!</button>
           </footer>
         </div>
       </div>
@@ -117,7 +110,7 @@
     <script src="bundle.js"></script>
     <script src="requests.js"></script>
     <!-- <script src="events.js"></script> -->
-    <script
+    <!-- <script
       src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
       integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
       crossorigin="anonymous"
@@ -131,7 +124,7 @@
       src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
       integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
       crossorigin="anonymous"
-    ></script>
+    ></script> -->
     <script src="network.js"></script>
   </body>
 </html>
