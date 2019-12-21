@@ -663,7 +663,7 @@ async function onClickAddItem(e) {
 
 
 function onGhostNodeMousemove(e){
-  e.stopPropagation();
+  //e.stopPropagation();
 
   let nodeX = mouseX - parentNodeSize * network.getScale();
   let nodeY = mouseY - parentNodeSize * network.getScale() + bounds.top;

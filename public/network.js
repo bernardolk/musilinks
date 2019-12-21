@@ -30,10 +30,11 @@ const defaultFontColor = "#eeeeee";
 const minRepulsion = 500;
 const maxRepulsion = 1000;
 const defaultBorderWidth = 2;
-const largerBorderWidth = 5;
+const largerBorderWidth = 6;
 const fixedNodeOptions = {
   fixed: { x: true, y: true },
-  borderWidth: largerBorderWidth
+  borderWidth: largerBorderWidth,
+  color: {border: "yellow"}
 };
 const unfixedNodeOptions = {
   fixed: { x: false, y: false },
