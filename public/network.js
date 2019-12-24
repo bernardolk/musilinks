@@ -2,6 +2,7 @@ var nodes = null;
 var edges = null;
 var network = null;
 var nodeIds = [];
+var selectedNode;
 
 var networkElement = document.getElementById("mynetwork");
 var bounds = networkElement.getBoundingClientRect();
@@ -34,13 +35,13 @@ const largerBorderWidth = 6;
 const fixedNodeOptions = {
   fixed: { x: true, y: true },
   borderWidth: largerBorderWidth,
-  color: {border: "yellow"}
+  color: { border: "yellow" }
 };
 const unfixedNodeOptions = {
   fixed: { x: false, y: false },
   borderWidth: defaultBorderWidth
 };
-const edgesWidth = 3.5; 
+const edgesWidth = 3.5;
 
 // effects applied to the node after it is released
 const releasedNodeOptions = {
@@ -122,12 +123,20 @@ function startNetwork(artistsData) {
       let releasedNode = network.body.nodes[releasedNodeId];
 
       // checks if user isnt dragging a fixed node (dont create links for those)
+      // Also checks if this node was found in MB database (if it was, then it's id [MBID]
+      // should be different than the artist's name, as this is the default when the node is
+      // created by spawning another node's related artists)
+
+      console.log(releasedNode.options.artistId);
+      console.log(releasedNode.options.label);
+
       if (
         releasedNode.options.fixed.x == false &&
-        releasedNode.options.fixed.y == false
+        releasedNode.options.fixed.y == false &&
+        releasedNode.options.artistId !== releasedNode.options.label
       ) {
         // checks if this node has already generated children
-        if (releasedNode.options.membersCreated == false) {     
+        if (releasedNode.options.membersCreated == false) {
           let artistId = releasedNode.options.artistId;
 
           // Augment original node edge length upon release
@@ -149,7 +158,7 @@ function startNetwork(artistsData) {
           let artistData = await getArtistInfo(artistId);
 
           releasedNode.setOptions({ borderWidth: defaultBorderWidth });
-          let options = {'edges': {'color': defaultColor}};
+          let options = { edges: { color: defaultColor } };
           renderCluster(releasedNodeId, artistData.relatedArtists, options);
         }
       }
@@ -223,13 +232,24 @@ function startNetwork(artistsData) {
 }
 
 async function openNodeModal(params) {
-  let selectedNode = network.body.nodes[params.nodes[0]];
+  selectedNode = network.body.nodes[params.nodes[0]];
   // Set artist's name as title of the modal
   document.getElementById("node-modal-title").innerHTML =
     selectedNode.options.label;
 
   // Creates spotify player
   let spotifyModalElement = document.getElementById("node-modal-player");
+
+  console.log(spotifyModalElement);
+
+  let relArtistsBtn = document.createElement('button');
+
+  relArtistsBtn.id = 'spawn-rel-artists-btn';
+  relArtistsBtn.classList.add('modal__btn');
+  relArtistsBtn.classList.add('modal__btn-primary');
+  relArtistsBtn.innerHTML = "Spawn Related Artists!";
+  document.getElementById('node-modal-footer').appendChild(relArtistsBtn);
+
   let player = document.createElement("iframe");
   player.id = "spotify-player";
   player.src =
@@ -243,7 +263,7 @@ async function openNodeModal(params) {
 
   // Opens modal
   MicroModal.show("node-modal", {
-    onClose: modal => onCloseNodeModal(spotifyModalElement)
+    onClose: onCloseNodeModal
   });
 
   let spotifyRelArtistElement = document.getElementById("node-modal-related");
@@ -253,12 +273,15 @@ async function openNodeModal(params) {
     selectedNode.options.spotifyId
   );
 
-  let relArtistsBtn = document.getElementById("spawn-rel-artists-btn");
-  
+  // let relArtistsBtn = document.getElementById("spawn-rel-artists-btn");
+
+
+  if(selectedNode.options.relArtistsCreated){
+    relArtistsBtn.style.backgroundColor = 'grey';
+  }
+
   console.log(selectedNode);
-  relArtistsBtn.addEventListener("click", e => {
-    onRelArtistsBtnClick(e, selectedNode);
-  });
+  relArtistsBtn.addEventListener("click", onRelArtistsBtnClick);
 
   // Creates more 'friendly' object to work with (not realy needed anymore)
   let relArtists = {};
@@ -311,7 +334,7 @@ async function openNodeModal(params) {
   //console.log(relArtistList);
 }
 
-let onRelArtistsBtnClick = async function(e, selectedNode) {
+const onRelArtistsBtnClick = async function(event) {
   //Searches Music Brainz for all artists at once
   //It is possible that we get repeated results
   //For instance, Alice Cooper is both a Person and a Group
@@ -320,59 +343,69 @@ let onRelArtistsBtnClick = async function(e, selectedNode) {
   //scanning for a group. If a group is not found for that artist
   //then we use the Person type MBID (MusicBrainz ID).
 
-  e.stopPropagation();
+  event.stopPropagation();
 
-  let mbQuery = "";
-  for (let i = 0; i < relArtistList.length; i++) {
-    if (i > 0) {
-      mbQuery += "+";
+  if (selectedNode.options.relArtistsCreated) {
+    MicroModal.close("node-modal");
+  } else {
+    let mbQuery = "";
+    for (let i = 0; i < relArtistList.length; i++) {
+      if (i > 0) {
+        mbQuery += "+";
+      }
+      mbQuery += "%22" + encodeURIComponent(relArtistList[i].name) + "%22";
     }
-    mbQuery += "%22" + encodeURIComponent(relArtistList[i].name) + "%22";
-  }
 
-  let searchResults = await searchMusicBrainz(mbQuery, 100);
+    let searchResults = await searchMusicBrainz(mbQuery, 100);
 
-  let relatedArtists = [];
-  let scannedNames = [];
-  for (let j = 0; j < relArtistList.length; j++) {
-    relatedArtists[j] = {
-      'id': 'notfound'
-      ,'spotifyId': relArtistList[j].spotifyId
-      ,'image': relArtistList[j].img
-      ,'name': relArtistList[j].name
-    };
-    for (let i = 0; i < Object.keys(searchResults.artists).length; i++) {
-      if (searchResults.artists[i].name === relArtistList[j].name) {
-        if(searchResults.artists[i].type === "Group"){
-          relatedArtists[j].id = searchResults.artists[i].id;
-          break;
+    let relatedArtists = [];
+    let scannedNames = [];
+    for (let j = 0; j < relArtistList.length; j++) {
+      // As a default, spotify rel MBID (id) is his name, so to uniquely identify it
+      // in the network even if we don't find any match.
+      relatedArtists[j] = {
+        id: relArtistList[j].name,
+        spotifyId: relArtistList[j].spotifyId,
+        image: relArtistList[j].img,
+        name: relArtistList[j].name
+      };
+      for (let i = 0; i < Object.keys(searchResults.artists).length; i++) {
+        if (searchResults.artists[i].name === relArtistList[j].name) {
+          if (searchResults.artists[i].type === "Group") {
+            relatedArtists[j].id = searchResults.artists[i].id;
+            break;
+          } else if (searchResults.artists[i].type === "Person") {
+            scannedNames.push({
+              name: searchResults.artists[i].name,
+              id: searchResults.artists[i].id
+            });
+            // If person is found first, do not stop. Just add to list of scanned names
+          }
         }
-        else if(searchResults.artists[i].type === "Person"){
-          scannedNames.push({'name': searchResults.artists[i].name, 'id' : searchResults.artists[i].id});       
+      }
+      // If no group match is found, check scanned names list for a 'person' type match
+      if (relatedArtists[j].id === relArtistList[j].name) {
+        for (let k = 0; k < scannedNames.length; k++) {
+          if (scannedNames[k].name == relatedArtists[j].name) {
+            relatedArtists[j].id = scannedNames[k].id;
+          }
         }
       }
     }
-    if(relatedArtists[j].id === 'notfound'){
-      for(let k=0; k < scannedNames.length; k++){
-        if(scannedNames[k].name == relatedArtists[j].name){
-          relatedArtists[j].id = scannedNames[k].id;
-        }
-      }
-    }
+
+    let options = { edges: { color: relatedArtistEdgeColor } };
+
+    selectedNode.setOptions({ relArtistsCreated: true });
+    MicroModal.close("node-modal");
+
+    renderCluster(selectedNode.options.id, relatedArtists, options);
   }
-
-  MicroModal.close("node-modal");
-  let options = {'edges': {'color' : relatedArtistEdgeColor}};
-
-  console.log(selectedNode.options);
-
-  renderCluster(selectedNode.options.id, relatedArtists, options);
 };
 
-
-
-function onCloseNodeModal(spotifyModalElement) {
-  spotifyModalElement.removeChild(document.getElementById("spotify-player"));
+var onCloseNodeModal = function() {
+  let spotifyPlayerElmnt = document.getElementById("spotify-player");
+  spotifyPlayerElmnt.parentElement.removeChild(spotifyPlayerElmnt);
+  console.log("test");
 
   let relArtists = Array.from(
     document.getElementsByClassName("related-artist-row")
@@ -386,9 +419,11 @@ function onCloseNodeModal(spotifyModalElement) {
   document
     .getElementById("spawn-rel-artists-btn")
     .removeEventListener("click", onRelArtistsBtnClick);
-}
 
-
+  let spwnBtn = document.getElementById('spawn-rel-artists-btn');
+  spwnBtn.parentElement.removeChild(spwnBtn);
+  
+};
 
 // Create related artists nodes (cluster)
 function renderCluster(targetNodeId, relatedArtists, options) {
@@ -413,7 +448,6 @@ function renderCluster(targetNodeId, relatedArtists, options) {
 
     // if node does not already exists in network
     if (duplicatedNode == null) {
-
       let configs = {
         id: lastNodeId + 1,
         artistId: relatedArtists[i].id,
@@ -438,7 +472,11 @@ function renderCluster(targetNodeId, relatedArtists, options) {
         y: targetNode.y
       });
 
-      edges.add({ from: targetNodeId, to: lastNodeId + 1, color: {color: options.edges.color}});
+      edges.add({
+        from: targetNodeId,
+        to: lastNodeId + 1,
+        color: { color: options.edges.color }
+      });
       nodeIds.push(lastNodeId + 1);
     }
 
@@ -460,7 +498,7 @@ function renderCluster(targetNodeId, relatedArtists, options) {
         edges.add({
           from: targetNodeId,
           to: duplicatedNode.options.id,
-          color: {color: options.edges.color}
+          color: { color: options.edges.color }
         });
       }
     }
@@ -514,7 +552,7 @@ function createNode(artistsData, Xo, Yo) {
     });
     nodeIds.push(lastNodeId + 1);
 
-    let options = {'edges':{'color': defaultColor}};
+    let options = { edges: { color: defaultColor } };
 
     renderCluster(lastNodeId + 1, artistsData.relatedArtists, options);
   }
@@ -522,8 +560,12 @@ function createNode(artistsData, Xo, Yo) {
   // if it exists, then we just create the relevant nodes around it
   else {
     if (!mainArtistNode.options.membersCreated) {
-      let options = {'edges':{'color': defaultColor}};
-      renderCluster(mainArtistNode.options.id, artistsData.relatedArtists, options);
+      let options = { edges: { color: defaultColor } };
+      renderCluster(
+        mainArtistNode.options.id,
+        artistsData.relatedArtists,
+        options
+      );
     }
   }
 }
