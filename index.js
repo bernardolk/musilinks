@@ -5,7 +5,8 @@ const express = require("express"),
   http = require("http"),
   path = require("path"),
   bodyparser = require("body-parser"),
-  fetch = require("node-fetch");
+  fetch = require("node-fetch"),
+  mongoose = require("Mongoose");
 
 // ----------- main execution -------------
 
@@ -15,7 +16,6 @@ const express = require("express"),
 main();
 
 async function main() {
-
   const app = express();
 
   app.set("port", 3000);
@@ -35,8 +35,10 @@ async function main() {
     res.render("index");
   });
 
-  app.get("/token", async function(req,res){
-    let token = await require("./authentication").catch(error => console.log(error));
+  app.get("/token", async function(req, res) {
+    let token = await require("./authentication").catch(error =>
+      console.log(error)
+    );
     res.send(token);
   });
 
@@ -49,7 +51,6 @@ async function main() {
     console.log("Server up and running on port " + app.get("port"));
   });
 }
-
 
 // function searchSpotify(searchInput) {
 //   let BASE_URL = "https://api.spotify.com/v1/search?";

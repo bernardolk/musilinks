@@ -4,7 +4,7 @@ var network = null;
 var nodeIds = [];
 var selectedNode;
 
-var networkElement = document.getElementById("mynetwork");
+var networkElement = document.getElementById("network-canvas");
 var bounds = networkElement.getBoundingClientRect();
 var mouseX;
 var mouseY;
@@ -56,13 +56,13 @@ const releasedNodeOptions = {
 MicroModal.init();
 
 // Called when the Visualization API is loaded.
-function startNetwork(artistsData) {
+function startNetwork(artistsData){
   let maxRepulsionMode = false;
   nodeIds = [];
   nodes = new vis.DataSet();
   edges = new vis.DataSet();
 
-  let container = document.getElementById("mynetwork");
+  let container = document.getElementById("network-canvas");
 
   let data = {
     nodes: nodes,
@@ -240,15 +240,13 @@ async function openNodeModal(params) {
   // Creates spotify player
   let spotifyModalElement = document.getElementById("node-modal-player");
 
-  console.log(spotifyModalElement);
+  let relArtistsBtn = document.createElement("button");
 
-  let relArtistsBtn = document.createElement('button');
-
-  relArtistsBtn.id = 'spawn-rel-artists-btn';
-  relArtistsBtn.classList.add('modal__btn');
-  relArtistsBtn.classList.add('modal__btn-primary');
+  relArtistsBtn.id = "spawn-rel-artists-btn";
+  relArtistsBtn.classList.add("modal__btn");
+  relArtistsBtn.classList.add("modal__btn-primary");
   relArtistsBtn.innerHTML = "Spawn Related Artists!";
-  document.getElementById('node-modal-footer').appendChild(relArtistsBtn);
+  document.getElementById("node-modal-footer").appendChild(relArtistsBtn);
 
   let player = document.createElement("iframe");
   player.id = "spotify-player";
@@ -261,77 +259,79 @@ async function openNodeModal(params) {
   player.allow = "encrypted-media";
   spotifyModalElement.appendChild(player);
 
+
+
   // Opens modal
   MicroModal.show("node-modal", {
     onClose: onCloseNodeModal
   });
 
-  let spotifyRelArtistElement = document.getElementById("node-modal-related");
+  if (selectedNode.options.spotifyId) {
+   
+    let spotifyRelArtistElement = document.getElementById("node-modal-related");
 
-  // fetch data from spotify
-  let spotifyRelArtists = await getRelatedArtists(
-    selectedNode.options.spotifyId
-  );
+    // fetch data from spotify
+    let spotifyRelArtists = await getRelatedArtists(
+      selectedNode.options.spotifyId
+    );
 
-  // let relArtistsBtn = document.getElementById("spawn-rel-artists-btn");
+    // let relArtistsBtn = document.getElementById("spawn-rel-artists-btn");
 
-
-  if(selectedNode.options.relArtistsCreated){
-    relArtistsBtn.style.backgroundColor = 'grey';
-  }
-
-  console.log(selectedNode);
-  relArtistsBtn.addEventListener("click", onRelArtistsBtnClick);
-
-  // Creates more 'friendly' object to work with (not realy needed anymore)
-  let relArtists = {};
-  let relLength = spotifyRelArtists.artists.length;
-  for (let i = 0; i < relLength; i++) {
-    relArtists[i] = {
-      name: spotifyRelArtists.artists[i].name,
-      spotifyId: spotifyRelArtists.artists[i].id,
-      genres: spotifyRelArtists.artists[i].genres,
-      image: "notfound.jpg"
-    };
-    if (spotifyRelArtists.artists[i].images.length > 0) {
-      relArtists[i].image = spotifyRelArtists.artists[i].images[0].url;
-    }
-  }
-
-  // Create related artist's image elements
-  let newRow;
-  for (let i = 0; i < Object.keys(relArtists).length; i++) {
-    if (i % relArtistsPerRowInModal == 0) {
-      newRow = document.createElement("div");
-      newRow.setAttribute("id", "related-artist-row-" + i);
-      newRow.setAttribute("class", "related-artist-row");
-      spotifyRelArtistElement.appendChild(newRow);
+    if (selectedNode.options.relArtistsCreated) {
+      relArtistsBtn.style.backgroundColor = "grey";
     }
 
-    let imgContainer = document.createElement("div");
-    imgContainer.setAttribute("class", "related-artist-image-div");
+    relArtistsBtn.addEventListener("click", onRelArtistsBtnClick);
 
-    let relArtImg = document.createElement("img");
-    relArtImg.setAttribute("id", "rel-artist-img-" + i);
-    relArtImg.setAttribute("class", "rounded-circle related-artist-image");
-    relArtImg.src = relArtists[i].image;
-    relArtImg.innerHTML = relArtists[i].name + " image";
+    // Creates more 'friendly' object to work with (not realy needed anymore)
+    let relArtists = {};
+    let relLength = spotifyRelArtists.artists.length;
+    for (let i = 0; i < relLength; i++) {
+      relArtists[i] = {
+        name: spotifyRelArtists.artists[i].name,
+        spotifyId: spotifyRelArtists.artists[i].id,
+        genres: spotifyRelArtists.artists[i].genres,
+        image: "notfound.jpg"
+      };
+      if (spotifyRelArtists.artists[i].images.length > 0) {
+        relArtists[i].image = spotifyRelArtists.artists[i].images[0].url;
+      }
+    }
 
-    let relArtLabel = document.createElement("div");
-    relArtLabel.setAttribute("class", "related-artist-image-label");
-    relArtLabel.innerHTML = relArtists[i].name;
+    // Create related artist's image elements
+    let newRow;
+    for (let i = 0; i < Object.keys(relArtists).length; i++) {
+      if (i % relArtistsPerRowInModal == 0) {
+        newRow = document.createElement("div");
+        newRow.setAttribute("id", "related-artist-row-" + i);
+        newRow.setAttribute("class", "related-artist-row");
+        spotifyRelArtistElement.appendChild(newRow);
+      }
 
-    imgContainer.appendChild(relArtImg);
-    imgContainer.appendChild(relArtLabel);
-    newRow.appendChild(imgContainer);
+      let imgContainer = document.createElement("div");
+      imgContainer.setAttribute("class", "related-artist-image-div");
 
-    relArtistList.push({
-      spotifyId: relArtists[i].spotifyId,
-      name: relArtists[i].name,
-      img: relArtists[i].image
-    });
+      let relArtImg = document.createElement("img");
+      relArtImg.setAttribute("id", "rel-artist-img-" + i);
+      relArtImg.setAttribute("class", "rounded-circle related-artist-image");
+      relArtImg.src = relArtists[i].image;
+      relArtImg.innerHTML = relArtists[i].name + " image";
+
+      let relArtLabel = document.createElement("div");
+      relArtLabel.setAttribute("class", "related-artist-image-label");
+      relArtLabel.innerHTML = relArtists[i].name;
+
+      imgContainer.appendChild(relArtImg);
+      imgContainer.appendChild(relArtLabel);
+      newRow.appendChild(imgContainer);
+
+      relArtistList.push({
+        spotifyId: relArtists[i].spotifyId,
+        name: relArtists[i].name,
+        img: relArtists[i].image
+      });
+    }
   }
-  //console.log(relArtistList);
 }
 
 const onRelArtistsBtnClick = async function(event) {
@@ -356,7 +356,11 @@ const onRelArtistsBtnClick = async function(event) {
       mbQuery += "%22" + encodeURIComponent(relArtistList[i].name) + "%22";
     }
 
+    console.log(mbQuery);
+
     let searchResults = await searchMusicBrainz(mbQuery, 100);
+
+    console.log(searchResults);
 
     let relatedArtists = [];
     let scannedNames = [];
@@ -370,7 +374,10 @@ const onRelArtistsBtnClick = async function(event) {
         name: relArtistList[j].name
       };
       for (let i = 0; i < Object.keys(searchResults.artists).length; i++) {
-        if (searchResults.artists[i].name === relArtistList[j].name) {
+        if (
+          searchResults.artists[i].name.toUpperCase() ===
+          relArtistList[j].name.toUpperCase()
+        ) {
           if (searchResults.artists[i].type === "Group") {
             relatedArtists[j].id = searchResults.artists[i].id;
             break;
@@ -420,9 +427,8 @@ var onCloseNodeModal = function() {
     .getElementById("spawn-rel-artists-btn")
     .removeEventListener("click", onRelArtistsBtnClick);
 
-  let spwnBtn = document.getElementById('spawn-rel-artists-btn');
+  let spwnBtn = document.getElementById("spawn-rel-artists-btn");
   spwnBtn.parentElement.removeChild(spwnBtn);
-  
 };
 
 // Create related artists nodes (cluster)
@@ -448,18 +454,6 @@ function renderCluster(targetNodeId, relatedArtists, options) {
 
     // if node does not already exists in network
     if (duplicatedNode == null) {
-      let configs = {
-        id: lastNodeId + 1,
-        artistId: relatedArtists[i].id,
-        spotifyId: relatedArtists[i].spotifyId,
-        membersCreated: false,
-        relArtistsCreated: false,
-        label: relatedArtists[i].name,
-        image: relatedArtists[i].image,
-        x: targetNode.x,
-        y: targetNode.y
-      };
-
       nodes.add({
         id: lastNodeId + 1,
         artistId: relatedArtists[i].id,

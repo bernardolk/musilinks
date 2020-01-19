@@ -34,7 +34,7 @@
 
   <body>
     <!-- Network -->
-    <div id="mynetwork"></div>
+    <div id="network-canvas"></div>
 
     <!-- Artist's information dialog modal -->
     <div class="modal micromodal-slide" id="node-modal" aria-hidden="true">
@@ -72,7 +72,7 @@
 
     <!-- Main screen -->
     <div class="modal micromodal-slide" id="main-modal" aria-hidden="true">
-      <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+      <div id= "main-modal__overlay" class="modal__overlay" tabindex="-1">
         <div
           class="main__modal__container"
           role="dialog"
@@ -89,12 +89,27 @@
           </main>
           <footer class="main__modal__footer">
             <div id="main-modal-icons">
-              <div class="placeholder-icon placeholder-icon-left"></div>
-              <div class="placeholder-icon placeholder-icon-left"></div>
-              <div class="placeholder-icon placeholder-icon-left"></div>
-              <div class="placeholder-icon placeholder-icon-left"></div>
-              <div class="placeholder-icon placeholder-icon-right"></div>
-            </div>
+              <div class="tooltip">
+                <span class="tooltiptext"> My LinkedIn page, if you wish to get in touch</span>
+                  <div class="placeholder-icon placeholder-icon-left"><img class="icon-img" src="linkedin_icon.png"></div>
+              </div>
+              <div class="tooltip">
+                <span class="tooltiptext"> Join the discussion @ Hacker News :)</span>
+              <div class="placeholder-icon placeholder-icon-left"> <img class="icon-img" src="hn_icon.png"></div>
+              </div>
+              <div class="tooltip">
+                <span class="tooltiptext"> Have feedback? Bug report, feature wish? Send me an email!</span>
+                <div class="placeholder-icon placeholder-icon-left"> <img class="icon-img" src="email_icon.png"></div>
+              </div>
+              <div class="tooltip">
+                <span class="tooltiptext"> Github page, feel free to clone and implement anything you think would be cool</span>
+                <div class="placeholder-icon placeholder-icon-left"> <img class="icon-img" src='github_icon.png'></div>             
+              </div>
+              <div class="tooltip">
+                <span class="tooltiptext tooltiptext-r"> Explanation of basic functionalities</span>
+                <div class="placeholder-icon placeholder-icon-right"> <img class="icon-img" src='help_icon.png'></div>
+              </div>   
+          </div>      
           </footer>
         </div>
       </div>

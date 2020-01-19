@@ -49,6 +49,10 @@ const onMainModalClose = function() {
 
 const onMainModalShow = function() {
   mainModalOpen = true;
+
+  if(network){
+    document.getElementById("main-modal__overlay").setAttribute('data-micromodal-close','');
+  }
 };
 
 // ---------------------------------------------
@@ -57,7 +61,7 @@ const onMainModalShow = function() {
 
 document.onkeypress = function(e) {
   e = e || window.event;
-let charCode = typeof e.which == "number" ? e.which : e.keyCode;
+  let charCode = typeof e.which == "number" ? e.which : e.keyCode;
   if (charCode && !mainModalOpen) {
     MicroModal.show("main-modal", {
       onClose: onMainModalClose,
@@ -66,10 +70,10 @@ let charCode = typeof e.which == "number" ? e.which : e.keyCode;
   }
 };
 
-document.onmousemove = function(e){
+document.onmousemove = function(e) {
   mouseX = e.clientX - bounds.left;
   mouseY = e.clientY - bounds.top;
-}
+};
 
 // ---------------------------------------------
 //                autocomplete
@@ -123,7 +127,6 @@ let debouncedSearch = debounce(async function() {
 function autocomplete(searchBar) {
   let currentFocus;
 
-
   // listen for user input in the search bar
   searchBar.addEventListener("input", function(e) {
     searchInput = e.target.value;
@@ -134,8 +137,6 @@ function autocomplete(searchBar) {
     debouncedSearch.bind(searchBar);
     debouncedSearch();
   });
-
-
 
   /*execute a function presses a key on the keyboard:*/
   searchBar.addEventListener("keydown", function(e) {
@@ -196,14 +197,16 @@ async function onClickItem(e) {
   // Get artistId from clicked autocomplete item
   // Checks if clicked on input tag or div tag
   let artistId;
-  if(e.target.tagName.toLowerCase() == "i"){
-    artistId = e.target.parentNode.getElementsByTagName("input")[0].getAttribute("data-artistid");
-  }else{
+  if (e.target.tagName.toLowerCase() == "i") {
+    artistId = e.target.parentNode
+      .getElementsByTagName("input")[0]
+      .getAttribute("data-artistid");
+  } else {
     artistId = e.target
-    .getElementsByTagName("input")[0]
-    .getAttribute("data-artistid");
+      .getElementsByTagName("input")[0]
+      .getAttribute("data-artistid");
   }
- 
+
   MicroModal.close("main-modal");
 
   closeAllLists();
@@ -245,21 +248,21 @@ async function onClickAddItem(e) {
     closeLoader();
     clearNetwork();
     startNetwork(artistData);
-  } 
+  }
 
   // There is already a network, let's add a node to it
   else {
     // Search artist on spotify for image
     let spotifySearch = await quickSearchSpotify(clickedArtistName);
-    let gnImg = 'notfound.jpg';
+    let gnImg = "notfound.jpg";
     if (spotifySearch.artists.items.length > 0) {
       let artistSpotifyId = spotifySearch.artists.items[0].id;
       let artistInfo = await getSpotifyArtistInfo(artistSpotifyId);
 
       if (artistInfo.images.length > 1) {
         gnImg = artistInfo.images[0].url;
-      } 
-    } 
+      }
+    }
 
     // Creates 'ghost node' that follows mouse movement
     // The size of the node scales according to the current zoom (scale)
@@ -273,14 +276,16 @@ async function onClickAddItem(e) {
     ghostNodeHolder.setAttribute("data-artistId", clickedArtistId);
     document.body.appendChild(ghostNodeHolder);
 
-    document.body.addEventListener("mousemove", e => {onGhostNodeMousemove(e)});
-    ghostNodeHolder.addEventListener("click", e => {onGhostNodeClick(e)});
-    
+    document.body.addEventListener("mousemove", e => {
+      onGhostNodeMousemove(e);
+    });
+    ghostNodeHolder.addEventListener("click", e => {
+      onGhostNodeClick(e);
+    });
   }
 }
 
-
-function onGhostNodeMousemove(e){
+function onGhostNodeMousemove(e) {
   //e.stopPropagation();
 
   let nodeX = mouseX - parentNodeSize * network.getScale();
@@ -290,8 +295,7 @@ function onGhostNodeMousemove(e){
   ghostNodeHolder.style.top = nodeY + "px";
 }
 
-
-async function onGhostNodeClick(e){
+async function onGhostNodeClick(e) {
   e.stopPropagation();
   let clickedArtistId = ghostNodeHolder.getAttribute("data-artistId");
   let canvasCoords = network.DOMtoCanvas({ x: mouseX, y: mouseY });
