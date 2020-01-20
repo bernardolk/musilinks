@@ -1,5 +1,5 @@
 var getArtistInfo = async function(artistId) {
-  console.log("artist ID > " + artistId);
+  // console.log("artist ID > " + artistId);
   // Fetch data from Musicbrainz
   let artistData = await getMbArtist(artistId);
 

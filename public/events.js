@@ -5,6 +5,7 @@ var ghostNodeClick = false;
 var ghostNodeHolder = null;
 var mainModalOpen = false;
 const debounceInterval = 500;
+var tutorialTooltipDisplayed = false;
 
 // ---------------------------------------------
 //             authenticate client
@@ -34,12 +35,25 @@ async function getSpotifyToken() {
 // ---------------------------------------------
 //             modal controls
 // ---------------------------------------------
+let loaderClosed = false;
 
 function showLoader() {
   MicroModal.show("loading-modal");
 }
 function closeLoader() {
   MicroModal.close("loading-modal");
+  if (!tutorialTooltipDisplayed) {
+    const infoTooltip = document.getElementById("info-container");
+    infoTooltip.classList.remove("hidden");
+    infoTooltip.classList.add("visible");
+    // infoTooltip.style.visibility = "visible";
+    setTimeout(function() {
+      infoTooltip.classList.remove("visible");
+      infoTooltip.classList.add("hidden");
+      // infoTooltip.style.visibility = "hidden";
+    }, 4000);
+    tutorialTooltipDisplayed = true;
+  }
 }
 
 const onMainModalClose = function() {
@@ -50,10 +64,21 @@ const onMainModalClose = function() {
 const onMainModalShow = function() {
   mainModalOpen = true;
 
-  if(network){
-    document.getElementById("main-modal__overlay").setAttribute('data-micromodal-close','');
+  if (network) {
+    document
+      .getElementById("main-modal__overlay")
+      .setAttribute("data-micromodal-close", "");
   }
 };
+
+const onHelpModalShow = function() {
+  console.log("Yah");
+  // MicroModal.close("main-modal");
+  MicroModal.show("help-modal");
+};
+
+const helpIcon = document.getElementById("help-icon");
+helpIcon.addEventListener("click", e => onHelpModalShow(e));
 
 // ---------------------------------------------
 //               document events

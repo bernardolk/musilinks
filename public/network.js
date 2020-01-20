@@ -127,8 +127,8 @@ function startNetwork(artistsData){
       // should be different than the artist's name, as this is the default when the node is
       // created by spawning another node's related artists)
 
-      console.log(releasedNode.options.artistId);
-      console.log(releasedNode.options.label);
+      // console.log(releasedNode.options.artistId);
+      // console.log(releasedNode.options.label);
 
       if (
         releasedNode.options.fixed.x == false &&
@@ -356,11 +356,11 @@ const onRelArtistsBtnClick = async function(event) {
       mbQuery += "%22" + encodeURIComponent(relArtistList[i].name) + "%22";
     }
 
-    console.log(mbQuery);
+    // console.log(mbQuery);
 
     let searchResults = await searchMusicBrainz(mbQuery, 100);
 
-    console.log(searchResults);
+    // console.log(searchResults);
 
     let relatedArtists = [];
     let scannedNames = [];
@@ -412,7 +412,7 @@ const onRelArtistsBtnClick = async function(event) {
 var onCloseNodeModal = function() {
   let spotifyPlayerElmnt = document.getElementById("spotify-player");
   spotifyPlayerElmnt.parentElement.removeChild(spotifyPlayerElmnt);
-  console.log("test");
+  // console.log("test");
 
   let relArtists = Array.from(
     document.getElementsByClassName("related-artist-row")
