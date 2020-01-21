@@ -18,7 +18,7 @@ main();
 async function main() {
   const app = express();
 
-  app.set("port", 3000);
+  app.set("port", 80);
   app.set("views", __dirname + "/views");
   app.set("view engine", "ejs");
   //app.use(bodyparser.urlencoded({ extended: "true" }));
