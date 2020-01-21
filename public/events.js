@@ -6,6 +6,7 @@ var ghostNodeHolder = null;
 var mainModalOpen = false;
 const debounceInterval = 500;
 var tutorialTooltipDisplayed = false;
+var helpTooltipDisplayed = false;
 
 // ---------------------------------------------
 //             authenticate client
@@ -68,6 +69,21 @@ const onMainModalShow = function() {
     document
       .getElementById("main-modal__overlay")
       .setAttribute("data-micromodal-close", "");
+  }
+
+  if (!tutorialTooltipDisplayed) {
+    const helpTooltip = document.getElementById("helpTooltip");
+    setTimeout(function() {
+      helpTooltip.classList.add("visible");
+      setTimeout(function() {
+        helpTooltip.classList.remove("visible");
+        helpTooltip.classList.add("hidden");
+        setTimeout(function() {
+          helpTooltip.classList.remove("hidden");
+          tutorialTooltipDisplayed = true;
+        }, 2000);
+      }, 3200);
+    }, 1200);
   }
 };
 
