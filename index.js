@@ -6,7 +6,7 @@ const express = require("express"),
   path = require("path"),
   bodyparser = require("body-parser"),
   fetch = require("node-fetch"),
-  mongoose = require("Mongoose");
+  mongoose = require("mongoose");
 
 // ----------- main execution -------------
 
