@@ -194,7 +194,7 @@ function getSeveralArtists(artistsIds) {
     }
   });
 
-  return fetch(FETCH_URL, spotifyGetParams).then(function(res) {
+  return fetch(FETCH_URL, window.spotifyGetParams).then(function(res) {
     return res.json();
   });
 }
@@ -283,7 +283,7 @@ function getRelatedArtists(artistId) {
   let BASE_URL = "https://api.spotify.com/v1/artists/";
   let FETCH_URL = BASE_URL + artistId + "/related-artists";
 
-  return fetch(FETCH_URL, spotifyGetParams)
+  return fetch(FETCH_URL, window.spotifyGetParams)
     .then(function(response) {
       return response.json();
     })
@@ -296,7 +296,7 @@ function getSpotifyArtistInfo(artistId) {
   let BASE_URL = "https://api.spotify.com/v1/artists/";
   let FETCH_URL = BASE_URL + artistId;
 
-  return fetch(FETCH_URL, spotifyGetParams).then(function(res) {
+  return fetch(FETCH_URL, window.spotifyGetParams).then(function(res) {
     return res.json();
   });
 }

@@ -396,25 +396,28 @@ var bounds = networkElement.getBoundingClientRect();
 //             authenticate client
 // ---------------------------------------------
 var spotifyToken;
+//var spotifyGetParams;
 
 getSpotifyToken();
 async function getSpotifyToken() {
   spotifyToken = await fetch("/token").then(function(res) {
+    return res.text();
+  }).then(function(token){
+    window.spotifyGetParams = {
+      method: "GET",
+      headers: {
+        Authorization: "Bearer " + token
+      },
+      mode: "cors",
+      cache: "default"
+    };
+
     MicroModal.show("main-modal", {
       onClose: onMainModalClose,
       onShow: onMainModalShow
     });
-    return res.text();
-  });
 
-  spotifyGetParams = {
-    method: "GET",
-    headers: {
-      Authorization: "Bearer " + spotifyToken
-    },
-    mode: "cors",
-    cache: "default"
-  };
+  }); 
 }
 
 // ---------------------------------------------
