@@ -3,9 +3,6 @@ var edges = null;
 var network = null;
 var nodeIds = [];
 var selectedNode;
-
-var networkElement = document.getElementById("network-canvas");
-var bounds = networkElement.getBoundingClientRect();
 var mouseX;
 var mouseY;
 var highlightedNode = null;

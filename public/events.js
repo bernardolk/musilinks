@@ -6,7 +6,8 @@ var ghostNodeHolder = null;
 var mainModalOpen = false;
 const debounceInterval = 500;
 var tutorialTooltipDisplayed = false;
-var helpTooltipDisplayed = false;
+var networkElement = document.getElementById("network-canvas");
+var bounds = networkElement.getBoundingClientRect();
 
 // ---------------------------------------------
 //             authenticate client
@@ -36,14 +37,13 @@ async function getSpotifyToken() {
 // ---------------------------------------------
 //             modal controls
 // ---------------------------------------------
-let loaderClosed = false;
-
 function showLoader() {
   MicroModal.show("loading-modal");
 }
 function closeLoader() {
   MicroModal.close("loading-modal");
   if (!tutorialTooltipDisplayed) {
+    // console.log("var = " + tutorialTooltipDisplayed );
     const infoTooltip = document.getElementById("info-container");
     infoTooltip.classList.remove("hidden");
     infoTooltip.classList.add("visible");
@@ -88,7 +88,6 @@ const onMainModalShow = function() {
 };
 
 const onHelpModalShow = function() {
-  console.log("Yah");
   // MicroModal.close("main-modal");
   MicroModal.show("help-modal");
 };

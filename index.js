@@ -4,14 +4,9 @@
 const express = require("express"),
   http = require("http"),
   path = require("path"),
-  bodyparser = require("body-parser"),
-  fetch = require("node-fetch"),
-  mongoose = require("mongoose");
+  bodyparser = require("body-parser");
 
 // ----------- main execution -------------
-
-//var token; //  spotify token
-//var spotifyGetParams; // GET request configuration for spotify
 
 main();
 

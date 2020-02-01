@@ -548,3 +548,11 @@ input {
   opacity: 0;
   transition: visibility 0s 2s, opacity 2s linear;
 }
+
+.gif {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 15px;
+  margin-bottom: 25px;
+}

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <title>Musilinks - Discover who's connected to whom</title>
     <meta charset="utf-8" />
     <meta
       name="viewport"
@@ -23,10 +24,6 @@
       rel="stylesheet"
       type="text/css"
     />
-    <!-- <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
-    /> -->
     <script
       type="text/javascript"
       src="https://unpkg.com/micromodal/dist/micromodal.min.js"
@@ -37,9 +34,10 @@
     <!-- Network -->
     <div id="network-canvas"></div>
 
+    <!-- Help popup text -->
     <div id="info-container" class="hidden">
       <div id="info">
-        Type anything to open search bar
+        Type anything to open search bar (see ? for help)
       </div>
     </div>
 
@@ -63,7 +61,6 @@
             ></button>
           </header>
           <main class="modal__content" id="node-modal-content">
-            <!-- <div class="modal__spotifyarea" id="node-modal-spotify"> -->
             <div class="modal__spotify__player" id="node-modal-player"></div>
             <div
               class="modal__spotify__related_artists"
@@ -71,11 +68,8 @@
             >
               <div id="related-artists-header">Related Artists</div>
             </div>
-            <!-- </div> -->
           </main>
-          <footer id="node-modal-footer" class="modal__footer">
-            <!-- <button class="modal__btn modal__btn-primary" id="spawn-rel-artists-btn">Spawn Related Artists!</button> -->
-          </footer>
+          <footer id="node-modal-footer" class="modal__footer"></footer>
         </div>
       </div>
     </div>
@@ -196,25 +190,33 @@
             Tutorial
           </h2>
           <main class="help__modal__content">
-            First, type an artist, member of band, musical group or simillar
-            into the search bar. <br /><br />
-            Click on the artist of your choice and a node will appear on the
-            screen with smaller nodes representing the artist`s (or band`s )
-            musical relationships. You can double click on a node to fix/unfix
-            it`s position. Click on a free node and double click anywhere on the
-            screen to fix it there. <br /><br />
-            Double click on a node to open the artist`s spotify page. There you
-            can listen to the artist top tracks or click a button to spawn the
-            artist`s related artists as nodes on the screen (colored with purple
-            links). <br />
-            <br />
-            Drag and drop a node to spawn that node`s musical relationships.
+            &bull; First, type an artist, member of band, musical group or simillar
+            into the search bar.<br />
+            &rarr;Type on the keyboard at any point to bring back the main screen!&larr; 
             <br /><br />
-            After adding your first node on the network, you can add new nodes
-            by clicking on the + icon on the right side of the autocomplete results <br/><br/>
-            Type on the keyboard at any point to bring back the main screen!<br /><br />
-            Double click anywhere on the screen to contract/expand the
-            network.<br /><br />
+            <img src = "m1_op.gif" class="gif"/>
+            &bull; Click on the artist of your choice and a node will appear on the
+            screen with smaller nodes representing the artist`s (or band`s )
+            musical relationships.
+            <br /><br />
+            &rarr; If no one shows up, maybe you selected a solo act :) 
+            <br /><br />
+            <img src = "m2_op.gif" class="gif"/>
+            &bull; Drag and drop a node to spawn that node`s musical relationships.
+            <br /><br />
+            <img src = "m3_op.gif" class="gif"/>
+            &bull; Double click on empty space to contract/expand the network.<br /><br />
+            &bull; Double click on a node to open the artist`s spotify page.<br /> 
+            &rarr; There you can listen to the artist top tracks or click a button to spawn the
+            artist`s related artists as nodes on the screen (colored with purple
+            links). 
+            <br /><br />
+            <img src = "m4_op.gif" class="gif"/>
+            &bull; Click on a free node and double click anywhere on the
+            screen to fix it there. <br /><br />
+            <img src = "m5_op.gif" class="gif"/>
+            &bull; After adding your first node on the network, you can add new nodes
+            by clicking on the + icon on the right side of the autocomplete results <br/><br/>    
             Have fun :)
           </main>
         </div>
@@ -223,22 +225,6 @@
 
     <script src="bundle.js"></script>
     <script src="requests.js"></script>
-    <!-- <script src="events.js"></script> -->
-    <!-- <script
-      src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-      integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-      integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-      integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-      crossorigin="anonymous"
-    ></script> -->
     <script src="network.js"></script>
   </body>
 </html>
