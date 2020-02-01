@@ -6,6 +6,7 @@ var ghostNodeHolder = null;
 var mainModalOpen = false;
 const debounceInterval = 500;
 var tutorialTooltipDisplayed = false;
+var helpPopUpDisplayed = false;
 var networkElement = document.getElementById("network-canvas");
 var bounds = networkElement.getBoundingClientRect();
 
@@ -42,8 +43,7 @@ function showLoader() {
 }
 function closeLoader() {
   MicroModal.close("loading-modal");
-  if (!tutorialTooltipDisplayed) {
-    // console.log("var = " + tutorialTooltipDisplayed );
+  if (!helpPopUpDisplayed) {
     const infoTooltip = document.getElementById("info-container");
     infoTooltip.classList.remove("hidden");
     infoTooltip.classList.add("visible");
@@ -53,7 +53,7 @@ function closeLoader() {
       infoTooltip.classList.add("hidden");
       // infoTooltip.style.visibility = "hidden";
     }, 4000);
-    tutorialTooltipDisplayed = true;
+    helpPopUpDisplayed = true;
   }
 }
 
