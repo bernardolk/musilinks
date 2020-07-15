@@ -406,10 +406,10 @@ const onRelArtistsBtnClick = async function(event) {
   }
 };
 
-var onCloseNodeModal = function() {
+
+var onCloseNodeModal = () => {
   let spotifyPlayerElmnt = document.getElementById("spotify-player");
   spotifyPlayerElmnt.parentElement.removeChild(spotifyPlayerElmnt);
-  // console.log("test");
 
   let relArtists = Array.from(
     document.getElementsByClassName("related-artist-row")
@@ -427,6 +427,8 @@ var onCloseNodeModal = function() {
   let spwnBtn = document.getElementById("spawn-rel-artists-btn");
   spwnBtn.parentElement.removeChild(spwnBtn);
 };
+
+
 
 // Create related artists nodes (cluster)
 function renderCluster(targetNodeId, relatedArtists, options) {

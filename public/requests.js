@@ -1,3 +1,5 @@
+
+//@Attention: is this closure necessary?
 var getArtistInfo = async function(artistId) {
   // console.log("artist ID > " + artistId);
   // Fetch data from Musicbrainz
