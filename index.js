@@ -28,7 +28,7 @@ main();
 async function main() {
    const app = express();
 
-   app.set("port", 8080);
+   app.set("port", process.env.PORT || 3000);
    app.set("views", __dirname + "/views");
    app.set("view engine", "ejs");
    //app.use(bodyparser.urlencoded({ extended: "true" }));
@@ -54,7 +54,10 @@ async function main() {
       res.json(search);
    });
 
-   http.createServer(app).listen(app.get("port"), function () {
+   let server = http.createServer(app);
+   server.on('error', (e) => console.log(e));
+
+   server.listen(app.get("port"), function () {
       console.log("Server up and running on port " + app.get("port"));
    });
 }
