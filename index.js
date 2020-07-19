@@ -22,6 +22,10 @@ var spotifyExpiration = null;
 /////////////////////////////////////////////////
 //               MAIN EXECUTION
 /////////////////////////////////////////////////
+
+// var test = require("./testrandom");
+var getToken = require("./authentication");
+
 refreshToken();
 main();
 
@@ -46,13 +50,18 @@ async function main() {
    });
 
    app.get("/token", async function (req, res) {
-      res.json({ token: spotifyToken, expiration: spotifyExpiration})
+      res.json({ token: spotifyToken, expiration: spotifyExpiration })
    });
 
    app.post("/search", jsonParser, async function (req, res) {
       let search = await searchMusicbrainz(req.body["search-text"]);
       res.json(search);
    });
+
+   // app.get("/test", async function(req,res){
+   //    let rand = await test();
+   //    res.send(`<h1>${rand.value}</h1>`);
+   // })
 
    let server = http.createServer(app);
    server.on('error', (e) => console.log(e));
@@ -70,7 +79,7 @@ function countdown(expiration) {
          if (spotifyExpiration > 0) {
             setTimeout(loop, 1000);
          }
-         else{
+         else {
             clearInterval(timer);
             resolve('ok');
          }
@@ -79,8 +88,8 @@ function countdown(expiration) {
    });
 }
 
-function refreshToken() {
-   require("./authentication")
+async function refreshToken() {
+   getToken()
       .then((auth) => {
          spotifyToken = auth.token;
          countdown(auth.expiration)
