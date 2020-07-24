@@ -1,3 +1,9 @@
+////////////////////////////////////////////////////////////////////////////////////////
+//                               GENERAL APP EVENTS CODE
+////////////////////////////////////////////////////////////////////////////////////////
+// @bernardolk - Bernardo Knackfuss 2019 - 2020
+////////////////////////////////////////////////////////////////////////////////////////
+
 // Control variables
 var ghostNodeClick = false;
 var ghostNodeHolder = null;
@@ -7,7 +13,7 @@ var tutorialTooltipDisplayed = false;
 var helpPopUpDisplayed = false;
 var networkElement = document.getElementById("network-canvas");
 var bounds = networkElement.getBoundingClientRect();
-
+var showTutorial = true;
 
 // ---------------------------------------------
 //             authenticate client
@@ -43,10 +49,10 @@ function countdown(expiration) {
       tokenExpiration = expiration;
       let timer = setInterval(() => tokenExpiration = tokenExpiration - 1, 1000);
       let loop = () => {
-         if(tokenExpiration > 0){
+         if (tokenExpiration > 0) {
             setTimeout(loop, 0);
          }
-         else{
+         else {
             clearInterval(timer);
             resolve('ok');
          }
@@ -59,6 +65,10 @@ function countdown(expiration) {
 //                     MAIN EXECUTION
 //////////////////////////////////////////////////////////////
 (async function main() {
+   // let localTutorialState = window.localStorage.getItem("musilinks_tutorial");
+   // if(localTutorialState === "DONE")
+   //    showTutorial = false;
+
    MicroModal.show("loading-modal");
    await getSpotifyToken();
 
@@ -78,7 +88,8 @@ function showLoader() {
 }
 function closeLoader() {
    MicroModal.close("loading-modal");
-   if (!helpPopUpDisplayed) {
+   //Displays a little bar on the screen. Don't display it if tutorial was recently displayed.
+   if (!helpPopUpDisplayed && !showTutorial) {
       const infoTooltip = document.getElementById("info-container");
       infoTooltip.classList.remove("hidden");
       infoTooltip.classList.add("visible");
@@ -113,20 +124,20 @@ const onMainModalShow = () => {
          .setAttribute("data-micromodal-close", "");
    }
 
-   if (!tutorialTooltipDisplayed) {
-      const helpTooltip = document.getElementById("helpTooltip");
-      setTimeout(function () {
-         helpTooltip.classList.add("visible");
-         setTimeout(function () {
-            helpTooltip.classList.remove("visible");
-            helpTooltip.classList.add("hidden");
-            setTimeout(function () {
-               helpTooltip.classList.remove("hidden");
-               tutorialTooltipDisplayed = true;
-            }, 2000);
-         }, 3200);
-      }, 1200);
-   }
+   // if (!tutorialTooltipDisplayed) {
+   //    const helpTooltip = document.getElementById("helpTooltip");
+   //    setTimeout(function () {
+   //       helpTooltip.classList.add("visible");
+   //       setTimeout(function () {
+   //          helpTooltip.classList.remove("visible");
+   //          helpTooltip.classList.add("hidden");
+   //          setTimeout(function () {
+   //             helpTooltip.classList.remove("hidden");
+   //             tutorialTooltipDisplayed = true;
+   //          }, 2000);
+   //       }, 3200);
+   //    }, 1200);
+   // }
 };
 
 const onHelpModalShow = function () {
@@ -141,16 +152,16 @@ helpIcon.addEventListener("click", e => onHelpModalShow(e));
 //               document events
 // ---------------------------------------------
 
-document.onkeypress = function (e) {
-   e = e || window.event;
-   let charCode = typeof e.which == "number" ? e.which : e.keyCode;
-   if (charCode && !mainModalOpen) {
-      MicroModal.show("main-modal", {
-         onClose: onMainModalClose,
-         onShow: onMainModalShow
-      });
-   }
-};
+// document.onkeypress = function (e) {
+//    e = e || window.event;
+//    let charCode = typeof e.which == "number" ? e.which : e.keyCode;
+//    if (charCode && !mainModalOpen) {
+//       MicroModal.show("main-modal", {
+//          onClose: onMainModalClose,
+//          onShow: onMainModalShow
+//       });
+//    }
+// };
 
 document.onmousemove = function (e) {
    mouseX = e.clientX - bounds.left;
@@ -200,16 +211,21 @@ let debouncedSearch = _.debounce(async function () {
             artistList[i].id +
             "'>";
 
-         // Creates 'add' button
-         let acAddBtnElmnt = document.createElement("button");
-         acAddBtnElmnt.setAttribute(
-            "class",
-            "btn btn-success btn-lg  autocomplete-btn"
-         );
-         acAddBtnElmnt.innerHTML = "+";
-         acItemElmnt.appendChild(acAddBtnElmnt);
-         acAddBtnElmnt.addEventListener("click", e => onClickAddItem(e)); // On 'add' button click
-         acItemElmnt.addEventListener("click", e => onClickItem(e)); // On search item click
+         // Creates 'add' buttons
+         if (network !== null) {
+            let acAddBtnElmnt = document.createElement("button");
+            acAddBtnElmnt.setAttribute(
+               "class",
+               "btn btn-success btn-lg  autocomplete-btn"
+            );
+            acAddBtnElmnt.innerHTML = "+";
+            acItemElmnt.appendChild(acAddBtnElmnt);
+            // On 'add' button click
+            acAddBtnElmnt.addEventListener("click", e => onClickAddItem(e)); 
+         }
+
+         // On search item click
+         acItemElmnt.addEventListener("click", e => onClickItem(e));
          acContainerElmnt.appendChild(acItemElmnt);
       }
    }
@@ -260,23 +276,18 @@ function autocomplete(searchBar) {
    });
 
    function addActive(x) {
-      /*a function to classify an item as "active":*/
       if (!x) return false;
-      /*start by removing the "active" class on all items:*/
       removeActive(x);
       if (currentFocus >= x.length) currentFocus = 0;
       if (currentFocus < 0) currentFocus = x.length - 1;
-      /*add class "autocomplete-active":*/
       x[currentFocus].classList.add("autocomplete-active");
    }
    function removeActive(x) {
-      /*a function to remove the "active" class from all autocomplete items:*/
       for (let i = 0; i < x.length; i++) {
          x[i].classList.remove("autocomplete-active");
       }
    }
 
-   /*execute a function when someone clicks in the document:*/
    document.addEventListener("click", function (e) {
       closeAllLists(e.target);
    });
@@ -302,12 +313,16 @@ async function onClickItem(e) {
 
    closeAllLists();
    showLoader();
-
    let resJSON = await getArtistInfo(artistId);
-
    closeLoader();
    clearNetwork();
    startNetwork(resJSON);
+
+   if(showTutorial){
+      MicroModal.show("tutorial-modal");
+      showTutorial = false;
+      window.localStorage.setItem("musilinks_tutorial", "DONE");
+   }
 }
 
 function closeAllLists() {

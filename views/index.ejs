@@ -1,234 +1,199 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <title>Musilinks - Discover who's connected to whom</title>
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
-    <link rel="shortcut icon" href="favicon.ico" />
-    <!-- <link
+
+<head>
+   <title>Musilinks - Discover who's connected to whom</title>
+   <meta charset="utf-8" />
+   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+   <link rel="shortcut icon" href="favicon.ico" />
+   <!-- <link
       rel="stylesheet"
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
       integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
       crossorigin="anonymous"
     /> -->
-    <link rel="stylesheet" type="text/css" href="style.css" />
-    <script
-      type="text/javascript"
-      src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.js"
-    ></script>
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis-network.min.css"
-      rel="stylesheet"
-      type="text/css"
-    />
-    <script
-      type="text/javascript"
-      src="https://unpkg.com/micromodal/dist/micromodal.min.js"
-    ></script>
-  </head>
+   <link rel="stylesheet" type="text/css" href="style.css" />
+   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.js"></script>
+   <link href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis-network.min.css" rel="stylesheet"
+      type="text/css" />
+   <script type="text/javascript" src="https://unpkg.com/micromodal/dist/micromodal.min.js"></script>
+</head>
 
-  <body>
- 
+<body>
+
    <!-- Open Search Button -->
    <div id="open-search-btn" class="quick-hidden"><img class="icon-img" src="search_icon.png" /></div>
-    <!-- Network -->
-    <div id="network-canvas"></div>
+   <!-- Network -->
+   <div id="network-canvas"></div>
 
-    <!-- Help popup text -->
-    <div id="info-container" class="hidden">
+   <!-- Help popup text -->
+   <div id="info-container" class="hidden">
       <div id="info">
-        Click the top left button or type anything to open search bar (see ? for help)
+         Click on the top left button to open search bar (or click on '?' for help)
       </div>
-    </div>
+   </div>
 
-       <!-- Main screen -->
-       <div class="modal micromodal-slide" id="main-modal" aria-hidden="true">
-         <div id="main-modal__overlay" class="modal__overlay" tabindex="-1">
-           <div
-             class="main__modal__container"
-             role="dialog"
-             aria-modal="true"
-             aria-labelledby="node-modal-title"
-           >
-             <h2 class="main__modal__title" id="main-modal-title">
+   <!-- Main screen -->
+   <div class="modal micromodal-slide" id="main-modal" aria-hidden="true">
+      <div id="main-modal__overlay" class="modal__overlay" tabindex="-1">
+         <div class="main__modal__container" role="dialog" aria-modal="true" aria-labelledby="node-modal-title">
+            <h2 class="main__modal__title" id="main-modal-title">
                Musilinks
-             </h2>
-             <main class="main__modal__content" id="main-modal-content">
+            </h2>
+            <main class="main__modal__content" id="main-modal-content">
                <form id="main-form">
-                 <input
-                   id="search-bar"
-                   type="text"
-                   name="search-bar-text"
-                   placeholder="start typing an artist, band member or musical group..."
-                 />
+                  <input id="search-bar" type="text" name="search-bar-text"
+                     placeholder="start typing an artist, band member or musical group..." />
                </form>
-             </main>
-             <footer class="main__modal__footer">
+            </main>
+            <footer class="main__modal__footer">
                <div id="main-modal-icons">
-                 <a
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   href="https://www.linkedin.com/in/bernardo-knackfuss-019935124/?locale=en_US"
-                 >
-                   <div class="tooltip">
-                     <span class="tooltiptext">
-                       My LinkedIn page, if you wish to get in touch</span
-                     >
-                     <div class="placeholder-icon placeholder-icon-left">
-                       <img class="icon-img" src="linkedin_icon.png" />
+                  <a target="_blank" rel="noopener noreferrer"
+                     href="https://www.linkedin.com/in/bernardo-knackfuss-019935124/?locale=en_US">
+                     <div class="tooltip">
+                        <span class="tooltiptext">
+                           My LinkedIn page, if you wish to get in touch</span>
+                        <div class="placeholder-icon placeholder-icon-left">
+                           <img class="icon-img" src="linkedin_icon.png" />
+                        </div>
                      </div>
-                   </div>
-                 </a>
-                 <a
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   href="https://news.ycombinator.com/"
-                 >
-                   <div class="tooltip">
-                     <span class="tooltiptext">
-                       Join the discussion @ Hacker News :)</span
-                     >
-                     <div class="placeholder-icon placeholder-icon-left">
-                       <img class="icon-img" src="hn_icon.png" />
+                  </a>
+                  <a target="_blank" rel="noopener noreferrer" href="https://news.ycombinator.com/">
+                     <div class="tooltip">
+                        <span class="tooltiptext">
+                           Join the discussion @ Hacker News :)</span>
+                        <div class="placeholder-icon placeholder-icon-left">
+                           <img class="icon-img" src="hn_icon.png" />
+                        </div>
                      </div>
-                   </div>
-                 </a>
-                 <a href="mailto:bernardo.knackfuss@gmail.com">
-                   <div class="tooltip">
-                     <span class="tooltiptext">
-                       Have feedback? Bug report, feature wish? Send me an
-                       email!</span
-                     >
-                     <div class="placeholder-icon placeholder-icon-left">
-                       <img class="icon-img" src="email_icon.png" />
+                  </a>
+                  <a href="mailto:bernardo.knackfuss@gmail.com">
+                     <div class="tooltip">
+                        <span class="tooltiptext">
+                           Have feedback? Bug report, feature wish? Send me an
+                           email!</span>
+                        <div class="placeholder-icon placeholder-icon-left">
+                           <img class="icon-img" src="email_icon.png" />
+                        </div>
                      </div>
-                   </div>
-                 </a>
-                 <a
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   href="https://github.com/bernardolk/musilinks"
-                 >
-                   <div class="tooltip">
-                     <span class="tooltiptext">
-                       Github page, feel free to clone and implement anything you
-                       think would be cool</span
-                     >
-                     <div class="placeholder-icon placeholder-icon-left">
-                       <img class="icon-img" src="github_icon.png" />
+                  </a>
+                  <a target="_blank" rel="noopener noreferrer" href="https://github.com/bernardolk/musilinks">
+                     <div class="tooltip">
+                        <span class="tooltiptext">
+                           Github page, feel free to clone and implement anything you
+                           think would be cool</span>
+                        <div class="placeholder-icon placeholder-icon-left">
+                           <img class="icon-img" src="github_icon.png" />
+                        </div>
                      </div>
-                   </div>
-                 </a>
-   
-                 <div class="tooltip">
-                   <span class="tooltiptext tooltiptext-r" id="helpTooltip">
-                     Explanation of basic functionalities</span
-                   >
-                   <div
-                     id="help-icon"
-                     class="placeholder-icon placeholder-icon-right"
-                   >
-                     <img class="icon-img" src="help_icon.png" />
-                   </div>
-                 </div>
+                  </a>
+
+                  <div class="tooltip">
+                     <span class="tooltiptext tooltiptext-r" id="helpTooltip">
+                        Explanation of basic functionalities</span>
+                     <div id="help-icon" class="placeholder-icon placeholder-icon-right">
+                        <img class="icon-img" src="help_icon.png" />
+                     </div>
+                  </div>
                </div>
-             </footer>
-           </div>
+            </footer>
          </div>
-       </div>
-   
-       <!-- Loading screen modal -->
-       <div class="modal micromodal-slide" id="loading-modal" aria-hidden="true">
-         <div class="modal__overlay" tabindex="-1">
-           <div class="loader"></div>
+      </div>
+   </div>
+
+   <!-- TUTORIAL MODAL -->
+   <div class="modal micromodal-slide" id="tutorial-modal" aria-hidden="true">
+      <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+         <div class="modal__container" role="dialog" aria-modal="true"
+            aria-labelledby="node-modal-title">
+            <header class="modal__header">
+               <h2 class="modal__title" id="tutorial-modal-title">
+                  Tutorial
+               </h2>
+               <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
+            </header>
+            <main class="modal__content" id="tutorial-modal-content">
+               <div style="width:300px">fake content</div>
+            </main>
+            <footer id="tutorial-modal-footer" class="modal__footer"></footer>
          </div>
-       </div>
-   
-       <!-- Instructions modal -->
-       <div class="modal micromodal-slide" id="help-modal" aria-hidden="true">
-         <div class="modal__overlay" tabindex="-1" data-micromodal-close>
-           <div
-             class="main__modal__container"
-             role="dialog"
-             aria-modal="true"
-             aria-labelledby="node-modal-title"
-           >
-             <h2 class="main__modal__title">
+      </div>
+   </div>
+
+
+   <!-- Loading screen modal -->
+   <div class="modal micromodal-slide" id="loading-modal" aria-hidden="true">
+      <div class="modal__overlay" tabindex="-1">
+         <div class="loader"></div>
+      </div>
+   </div>
+
+   <!-- Instructions modal -->
+   <div class="modal micromodal-slide" id="help-modal" aria-hidden="true">
+      <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+         <div class="main__modal__container" role="dialog" aria-modal="true" aria-labelledby="node-modal-title">
+            <h2 class="main__modal__title">
                Tutorial
-             </h2>
-             <main class="help__modal__content">
+            </h2>
+            <main class="help__modal__content">
                &bull; First, type an artist, member of band, musical group or simillar
                into the search bar.<br />
-               &rarr;Type on the keyboard at any point to bring back the main screen!&larr; 
+               &rarr;Type on the keyboard at any point to bring back the main screen!&larr;
                <br /><br />
-               <img src = "m1_op.gif" class="gif"/>
+               <img src="m1_op.gif" class="gif" />
                &bull; Click on the artist of your choice and a node will appear on the
                screen with smaller nodes representing the artist`s (or band`s )
                musical relationships.
                <br /><br />
-               &rarr; If no one shows up, maybe you selected a solo act :) 
+               &rarr; If no one shows up, maybe you selected a solo act :)
                <br /><br />
-               <img src = "m2_op.gif" class="gif"/>
+               <img src="m2_op.gif" class="gif" />
                &bull; Drag and drop a node to spawn that node`s musical relationships.
                <br /><br />
-               <img src = "m3_op.gif" class="gif"/>
+               <img src="m3_op.gif" class="gif" />
                &bull; Double click on empty space to contract/expand the network.<br /><br />
-               &bull; Double click on a node to open the artist`s spotify page.<br /> 
+               &bull; Double click on a node to open the artist`s spotify page.<br />
                &rarr; There you can listen to the artist top tracks or click a button to spawn the
                artist`s related artists as nodes on the screen (colored with purple
-               links). 
+               links).
                <br /><br />
-               <img src = "m4_op.gif" class="gif"/>
+               <img src="m4_op.gif" class="gif" />
                &bull; Click on a free node and double click anywhere on the
                screen to fix it there. <br /><br />
-               <img src = "m5_op.gif" class="gif"/>
+               <img src="m5_op.gif" class="gif" />
                &bull; After adding your first node on the network, you can add new nodes
-               by clicking on the + icon on the right side of the autocomplete results <br/><br/>    
+               by clicking on the + icon on the right side of the autocomplete results <br /><br />
                Have fun :)
-             </main>
-           </div>
+            </main>
          </div>
-       </div>
-
-    <!-- Artist's information dialog modal -->
-    <div class="modal micromodal-slide" id="node-modal" aria-hidden="true">
-      <div class="modal__overlay" tabindex="-1" data-micromodal-close>
-        <div
-          class="modal__container"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="node-modal-title"
-        >
-          <header class="modal__header">
-            <h2 class="modal__title" id="node-modal-title">
-              Artist
-            </h2>
-            <button
-              class="modal__close"
-              aria-label="Close modal"
-              data-micromodal-close
-            ></button>
-          </header>
-          <main class="modal__content" id="node-modal-content">
-            <div class="modal__spotify__player" id="node-modal-player"></div>
-            <div
-              class="modal__spotify__related_artists"
-              id="node-modal-related"
-            >
-              <div id="related-artists-header">Related Artists</div>
-            </div>
-          </main>
-          <footer id="node-modal-footer" class="modal__footer"></footer>
-        </div>
       </div>
-    </div>
+   </div>
+
+   <!-- Artist's information dialog modal -->
+   <div class="modal micromodal-slide" id="node-modal" aria-hidden="true">
+      <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+         <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="node-modal-title">
+            <header class="modal__header">
+               <h2 class="modal__title" id="node-modal-title">
+                  Artist
+               </h2>
+               <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
+            </header>
+            <main class="modal__content" id="node-modal-content">
+               <div class="modal__spotify__player" id="node-modal-player"></div>
+               <div class="modal__spotify__related_artists" id="node-modal-related">
+                  <div id="related-artists-header">Related Artists</div>
+               </div>
+            </main>
+            <footer id="node-modal-footer" class="modal__footer"></footer>
+         </div>
+      </div>
+   </div>
 
    <script src="plugins/lodash/lodash.js"></script>
-    <script src="requests.js"></script>
-    <script src="network.js"></script>
-    <script src="events.js"></script>
-  </body>
+   <script src="requests.js"></script>
+   <script src="network.js"></script>
+   <script src="events.js"></script>
+</body>
+
 </html>
