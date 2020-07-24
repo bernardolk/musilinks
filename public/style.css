@@ -572,19 +572,34 @@ input {
    transition: visibility 0.5s linear, opacity 0.5s linear;
 }
 
+#open-tutorial-btn{
+   background-color: rgb(50, 47, 78);
+   border-radius: 50%;
+   border: 3px solid rgb(157, 161, 212);
+   visibility: visible;
+   opacity: 100;
+   width: 80px;
+   height: 80px;
+   left: calc(100% - 30px - 80px);
+   top: calc(100% - 30px - 80px);
+   position: absolute;
+   z-index: 97;
+   transition: visibility 0.5s linear, opacity 0.5s linear;
+}
+
+
 .quick-hidden {
    visibility: hidden !important;
    opacity: 0 !important;
  }
 
 
- 
-.tutorial__modal {
+#tutorial-modal {
    background-color: #1a2636;
    padding: 30px;
-   max-width: 1200px;
-   max-height: 80vh;
-   width: 70%;
+   /* max-width: 1200px;
+   max-height: 80vh; */
+   /* width: 820px; */
    /*max-height: 45%;*/
    border-radius: 45px;
    overflow-y: auto;

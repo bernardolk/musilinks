@@ -108,6 +108,9 @@ const onMainModalClose = () => {
    document
       .getElementById("open-search-btn")
       .classList.remove("quick-hidden");
+   document
+      .getElementById("open-tutorial-btn")
+      .classList.remove("quick-hidden");
    searchBar.value = "";
 };
 
@@ -116,6 +119,9 @@ const onMainModalShow = () => {
 
    document
       .getElementById("open-search-btn")
+      .classList.add("quick-hidden");
+   document
+      .getElementById("open-tutorial-btn")
       .classList.add("quick-hidden");
 
    if (network) {
@@ -174,7 +180,10 @@ document.addEventListener("DOMContentLoaded", function () {
          onClose: onMainModalClose,
          onShow: onMainModalShow
       });
-   })
+   });
+   document.getElementById("open-tutorial-btn").addEventListener("click", () => {
+      MicroModal.show("tutorial-modal");
+   });
 });
 
 // ---------------------------------------------
@@ -221,7 +230,7 @@ let debouncedSearch = _.debounce(async function () {
             acAddBtnElmnt.innerHTML = "+";
             acItemElmnt.appendChild(acAddBtnElmnt);
             // On 'add' button click
-            acAddBtnElmnt.addEventListener("click", e => onClickAddItem(e)); 
+            acAddBtnElmnt.addEventListener("click", e => onClickAddItem(e));
          }
 
          // On search item click
@@ -318,7 +327,7 @@ async function onClickItem(e) {
    clearNetwork();
    startNetwork(resJSON);
 
-   if(showTutorial){
+   if (showTutorial) {
       MicroModal.show("tutorial-modal");
       showTutorial = false;
       window.localStorage.setItem("musilinks_tutorial", "DONE");

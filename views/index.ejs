@@ -22,7 +22,11 @@
 <body>
 
    <!-- Open Search Button -->
-   <div id="open-search-btn" class="quick-hidden"><img class="icon-img" src="search_icon.png" /></div>
+   <div id="open-search-btn" class="quick-hidden"><img class="icon-img" src="search_icon.png" />
+   </div>
+    <!-- Open tutorial Button -->
+    <div id="open-tutorial-btn" class="quick-hidden"><img class="icon-img" src="help_icon.png" />
+    </div>
    <!-- Network -->
    <div id="network-canvas"></div>
 
@@ -58,7 +62,7 @@
                         </div>
                      </div>
                   </a>
-                  <a target="_blank" rel="noopener noreferrer" href="https://news.ycombinator.com/">
+                  <!-- <a target="_blank" rel="noopener noreferrer" href="https://news.ycombinator.com/">
                      <div class="tooltip">
                         <span class="tooltiptext">
                            Join the discussion @ Hacker News :)</span>
@@ -66,7 +70,7 @@
                            <img class="icon-img" src="hn_icon.png" />
                         </div>
                      </div>
-                  </a>
+                  </a> -->
                   <a href="mailto:bernardo.knackfuss@gmail.com">
                      <div class="tooltip">
                         <span class="tooltiptext">
@@ -80,17 +84,25 @@
                   <a target="_blank" rel="noopener noreferrer" href="https://github.com/bernardolk/musilinks">
                      <div class="tooltip">
                         <span class="tooltiptext">
-                           Github page, feel free to clone and implement anything you
-                           think would be cool</span>
+                           Github page (yup, open source)</span>
                         <div class="placeholder-icon placeholder-icon-left">
                            <img class="icon-img" src="github_icon.png" />
+                        </div>
+                     </div>
+                  </a>
+                  <a target="_blank" rel="noopener noreferrer" href="https://github.com/bernardolk/musilinks">
+                     <div class="tooltip">
+                        <span class="tooltiptext tooltiptext-r" id="shareTooltip">
+                           Share this!</span>
+                        <div class="placeholder-icon placeholder-icon-left">
+                           <img class="icon-img" src="share.png" />
                         </div>
                      </div>
                   </a>
 
                   <div class="tooltip">
                      <span class="tooltiptext tooltiptext-r" id="helpTooltip">
-                        Explanation of basic functionalities</span>
+                        How does this work?</span>
                      <div id="help-icon" class="placeholder-icon placeholder-icon-right">
                         <img class="icon-img" src="help_icon.png" />
                      </div>
@@ -104,16 +116,15 @@
    <!-- TUTORIAL MODAL -->
    <div class="modal micromodal-slide" id="tutorial-modal" aria-hidden="true">
       <div class="modal__overlay" tabindex="-1" data-micromodal-close>
-         <div class="modal__container" role="dialog" aria-modal="true"
-            aria-labelledby="node-modal-title">
+         <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="node-modal-title">
             <header class="modal__header">
                <h2 class="modal__title" id="tutorial-modal-title">
-                  Tutorial
+                  One-Minute Demo
                </h2>
                <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
             </header>
             <main class="modal__content" id="tutorial-modal-content">
-               <div style="width:300px">fake content</div>
+               <iframe width="640" height="480" src="https://www.youtube.com/embed/HUkceRhj5uI" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </main>
             <footer id="tutorial-modal-footer" class="modal__footer"></footer>
          </div>
