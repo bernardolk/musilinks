@@ -8,7 +8,6 @@
 }
 .autocomplete-items {
   position: absolute;
-  border: 1px solid #d4d4d4;
   border-bottom: none;
   border-top: none;
   z-index: 99;
@@ -21,12 +20,13 @@
 .autocomplete-items div {
   padding: 15px;
   cursor: pointer;
-  background-color: #fff;
-  border-bottom: 1px solid #d4d4d4;
+  background-color: #283b53;
+  border-bottom: 1px solid #455972;
+  color: white;
 }
 .autocomplete-items div:hover {
   /*when hovering an item:*/
-  background-color: #e9e9e9;
+  background-color: #5f728a;
 }
 .autocomplete-active {
   /*when navigating through the items using the arrow keys:*/
@@ -127,9 +127,8 @@ body {
   background-color: #1a2636;
   padding: 30px;
   max-width: 700px;
-  max-height: 80vh;
+  max-height: 70vh;
   border-radius: 4px;
-  overflow-y: auto;
   box-sizing: border-box;
 }
 
@@ -232,12 +231,6 @@ body {
 /**************************\
   Node modal styles
 \**************************/
-
-/* .modal__spotifyarea{
-    position:relative;
-    border: 2px solid green;
-  }*/
-
 .modal__spotify__player {
   float: left;
 }
@@ -631,7 +624,10 @@ input {
 }
 
 
- @media (max-width: 700px), (orientation: landscape){
+/*//////////////////////////////////////////////////////
+//                 RESPONSIVE BEHAVIOUR 
+///////////////////////////////////////////////////// */
+ @media (max-width: 700px){
    .main__modal__title{
       font-size: 2.5rem;
    }
@@ -639,21 +635,80 @@ input {
    .main__modal__container{
       width: 95%;
       padding: 15px;
-   }  
+   }
+
+   .modal__container{
+      width: 95%;
+      padding: 15px;
+      max-height: 70vh;
+   }
+   
+   /*tutorial modal*/
+   .tutorial__modal__title{
+      font-size: 2.5rem;
+   }
+
+   #tutorial-modal{
+      width: 95%;
+      padding: 15px;
+      height: 70%;
+   } 
+
+   #youtube-iframe{
+      width: 100%;
+      height: 70%;
+   }
+
+   #spotify-player{
+      width:100%;
+   }
+
+   #open-search-btn{ 
+      width: 55px;
+      height:55px;
+      top: 15px;
+      left: 15px;
+   }
+   #open-tutorial-btn{
+      width: 55px;
+      height:55px;
+      left: calc(100% - 15px - 55px);
+      top: calc(100% - 15px - 55px);
+   }
  }
 
-@media (orientation: landscape){
+@media (max-width: 700px), (orientation: landscape) and (max-height: 500px){
    .main__modal__content{
       margin-top: 0;
       margin-bottom: 0;
    }
 
-   .main__modal__title{
-      font-size: 3.5rem;
-   }
-
    #search-bar{
       font-size: 1.0rem;
+   }
+
+   .autocomplete-items div{
+      padding: 8px;
+   }
+}
+
+/*When shrinking window size in height*/
+@media (orientation: landscape) and (max-height: 400px){
+   #mobile-main-modal-text{
+      display:none;  
+   }
+   .main__modal__container{
+      padding-top: 10px;
+   }
+}
+
+@media (orientation: landscape) and (max-height: 320px){
+   #main-modal-title{
+      margin-top: 5px;
+   }
+   .placeholder-icon{
+      width: 32px;
+      height: 32px;
    }
 }
 
@@ -670,9 +725,5 @@ input {
    .placeholder-icon{
       margin: 6px;
    }
-
-   /* #email-icon, #github-icon, #linkedin-icon{
-      float: none;
-   } */
 }
 

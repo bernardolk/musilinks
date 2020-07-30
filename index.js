@@ -84,7 +84,7 @@ function countdown(expiration) {
       let timer = setInterval(() => spotifyExpiration = spotifyExpiration - 1, 1000);
       let loop = () => {
          if (spotifyExpiration > 0) {
-            log(`Test log, spotifyExpiration = ${spotifyExpiration}`)
+            // log(`Test log, spotifyExpiration = ${spotifyExpiration}`)
             setTimeout(loop, 1000);
          }
          else {
