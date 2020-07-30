@@ -11,13 +11,15 @@
 const express = require("express"),
    http = require("http"),
    path = require("path"),
-   bodyparser = require("body-parser");
+   bodyparser = require("body-parser"),
+   fs = require("fs");
 
 /////////////////////////////////////////////////
 //                  STATE
 /////////////////////////////////////////////////
 var spotifyToken = null;
 var spotifyExpiration = null;
+var globalDate = null;
 
 /////////////////////////////////////////////////
 //               MAIN EXECUTION
@@ -40,23 +42,28 @@ async function main() {
 
    var jsonParser = bodyparser.json();
 
-   app.use(function (err, req, res, next) {
+   app.use((err, _req , res, _next) => {
       console.error(err.stack);
       res.status(500).send("Error caught! Debug this bernardo...");
    });
 
-   app.get("/", function (req, res) {
+   app.get("/", (_req , res) => {
       res.render("index");
    });
 
-   app.get("/token", async function (req, res) {
+   app.get("/token", async (_req , res) => {
       res.json({ token: spotifyToken, expiration: spotifyExpiration })
    });
 
-   app.post("/search", jsonParser, async function (req, res) {
+   app.post("/search", jsonParser, async (req, res) => {
       let search = await searchMusicbrainz(req.body["search-text"]);
       res.json(search);
    });
+
+   // app.get("/logs", async (req, res) => {
+   //    if(req.query.pwd !== process.env.LOGPWD)
+   //       return res.send('<h1>Unauthorized</h1>');
+   // })
 
    // app.get("/test", async function(req,res){
    //    let rand = await test();
@@ -77,9 +84,12 @@ function countdown(expiration) {
       let timer = setInterval(() => spotifyExpiration = spotifyExpiration - 1, 1000);
       let loop = () => {
          if (spotifyExpiration > 0) {
+            log(`Test log, spotifyExpiration = ${spotifyExpiration}`)
             setTimeout(loop, 1000);
          }
          else {
+            log(`Countdown promise resolving, spotifyExpiration = ${spotifyExpiration}
+now awaiting token renewal. ${globalDate}`);
             clearInterval(timer);
             resolve('ok');
          }
@@ -92,8 +102,17 @@ async function refreshToken() {
    getToken()
       .then((auth) => {
          spotifyToken = auth.token;
+         log(`Token acquired, spotifyToken = ${spotifyToken} and expiration = ${auth.
+expiration}.` );
          countdown(auth.expiration)
             .then(() => refreshToken());
       })
       .catch(error => console.log(error));
+}
+
+
+
+function log(message){
+   globalDate = new Date();
+   console.log("\n" + message + " :: " + globalDate.toJSON());
 }

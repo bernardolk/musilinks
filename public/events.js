@@ -69,6 +69,10 @@ function countdown(expiration) {
    // if(localTutorialState === "DONE")
    //    showTutorial = false;
 
+   if (window.innerWidth < 700 ) {
+      document.getElementById('search-bar').placeholder = "";
+  }
+
    MicroModal.show("loading-modal");
    await getSpotifyToken();
 
