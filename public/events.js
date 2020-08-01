@@ -14,6 +14,7 @@ var helpPopUpDisplayed = false;
 var networkElement = document.getElementById("network-canvas");
 var bounds = networkElement.getBoundingClientRect();
 var showTutorial = true;
+var searchMode = 'CREATE';
 
 // ---------------------------------------------
 //             authenticate client
@@ -69,13 +70,12 @@ function countdown(expiration) {
    // if(localTutorialState === "DONE")
    //    showTutorial = false;
 
-   if (window.innerWidth < 700 ) {
+   if (window.innerWidth < 700) {
       document.getElementById('search-bar').placeholder = "";
-  }
+   }
 
    MicroModal.show("loading-modal");
    await getSpotifyToken();
-
    MicroModal.close("loading-modal");
 
    MicroModal.show("main-modal", {
@@ -90,6 +90,8 @@ function countdown(expiration) {
 function showLoader() {
    MicroModal.show("loading-modal");
 }
+
+
 function closeLoader() {
    MicroModal.close("loading-modal");
    //Displays a little bar on the screen. Don't display it if tutorial was recently displayed.
@@ -102,52 +104,55 @@ function closeLoader() {
          infoTooltip.classList.remove("visible");
          infoTooltip.classList.add("hidden");
          // infoTooltip.style.visibility = "hidden";
-      }, 4000);
+      }, 5000);
       helpPopUpDisplayed = true;
    }
 }
 
 const onMainModalClose = () => {
    mainModalOpen = false;
+   searchBar.value = "";
+   if(!showTutorial){
+      displayBtns();
+   }
+};
+
+
+const displayBtns = () => {
    document
       .getElementById("open-search-btn")
       .classList.remove("quick-hidden");
    document
       .getElementById("open-tutorial-btn")
       .classList.remove("quick-hidden");
-   searchBar.value = "";
-};
+   document
+      .getElementById("add-artist-btn")
+      .classList.remove("quick-hidden");
+}
+
+const hideBtns = () => {
+   document
+      .getElementById("open-search-btn")
+      .classList.add("quick-hidden");
+   document
+      .getElementById("open-tutorial-btn")
+      .classList.add("quick-hidden");
+   document
+      .getElementById("add-artist-btn")
+      .classList.add("quick-hidden");
+}
+
 
 const onMainModalShow = () => {
    mainModalOpen = true;
 
-   document
-      .getElementById("open-search-btn")
-      .classList.add("quick-hidden");
-   document
-      .getElementById("open-tutorial-btn")
-      .classList.add("quick-hidden");
+   hideBtns();
 
    if (network) {
       document
          .getElementById("main-modal__overlay")
          .setAttribute("data-micromodal-close", "");
    }
-
-   // if (!tutorialTooltipDisplayed) {
-   //    const helpTooltip = document.getElementById("helpTooltip");
-   //    setTimeout(function () {
-   //       helpTooltip.classList.add("visible");
-   //       setTimeout(function () {
-   //          helpTooltip.classList.remove("visible");
-   //          helpTooltip.classList.add("hidden");
-   //          setTimeout(function () {
-   //             helpTooltip.classList.remove("hidden");
-   //             tutorialTooltipDisplayed = true;
-   //          }, 2000);
-   //       }, 3200);
-   //    }, 1200);
-   // }
 };
 
 const onHelpModalShow = function () {
@@ -180,13 +185,24 @@ document.onmousemove = function (e) {
 
 document.addEventListener("DOMContentLoaded", function () {
    document.getElementById("open-search-btn").addEventListener("click", () => {
+      searchMode = 'CREATE';
       MicroModal.show("main-modal", {
          onClose: onMainModalClose,
          onShow: onMainModalShow
       });
    });
    document.getElementById("open-tutorial-btn").addEventListener("click", () => {
-      MicroModal.show("tutorial-modal");
+      MicroModal.show("tutorial-modal", {
+         onClose: displayBtns
+      });
+      hideBtns();
+   });
+   document.getElementById("add-artist-btn").addEventListener("click", () => {
+      searchMode = 'ADD';
+      MicroModal.show("main-modal", {
+         onClose: onMainModalClose,
+         onShow: onMainModalShow
+      });
    });
 });
 
@@ -224,21 +240,17 @@ let debouncedSearch = _.debounce(async function () {
             artistList[i].id +
             "'>";
 
-         // Creates 'add' buttons
-         if (network !== null) {
-            let acAddBtnElmnt = document.createElement("button");
-            acAddBtnElmnt.setAttribute(
-               "class",
-               "btn btn-success btn-lg  autocomplete-btn"
-            );
-            acAddBtnElmnt.innerHTML = "+";
-            acItemElmnt.appendChild(acAddBtnElmnt);
-            // On 'add' button click
-            acAddBtnElmnt.addEventListener("click", e => onClickAddItem(e));
+         // On search item click
+         if (searchMode === 'CREATE') {
+            acItemElmnt.addEventListener("click", e => onClickItem(e));
+         }
+         else if (searchMode === 'ADD') {
+            acItemElmnt.addEventListener("click", e => onClickAddItem(e));
+         }
+         else {
+            console.log('searchMode is in an invalid state. Check where this variable is set.');
          }
 
-         // On search item click
-         acItemElmnt.addEventListener("click", e => onClickItem(e));
          acContainerElmnt.appendChild(acItemElmnt);
       }
    }
@@ -328,14 +340,20 @@ async function onClickItem(e) {
    showLoader();
    let resJSON = await getArtistInfo(artistId);
    closeLoader();
-   clearNetwork();
-   startNetwork(resJSON);
 
    if (showTutorial) {
-      MicroModal.show("tutorial-modal");
+      MicroModal.show("tutorial-modal", {
+         onClose: displayBtns
+      });
       showTutorial = false;
       window.localStorage.setItem("musilinks_tutorial", "DONE");
    }
+   else {
+      displayBtns();
+   }
+
+   clearNetwork();
+   startNetwork(resJSON);
 }
 
 function closeAllLists() {
@@ -357,51 +375,38 @@ async function onClickAddItem(e) {
    let clickedArtistName = e.target.parentNode.getElementsByTagName("input")[0]
       .value;
 
-   // If there is no network (first click user did was on add button)
-   if (network == null) {
-      // Loading animation
-      showLoader();
+   // Search artist on spotify for image
+   let spotifySearch = await quickSearchSpotify(clickedArtistName);
+   let gnImg = "notfound.jpg";
+   if (spotifySearch.artists.items.length > 0) {
+      let artistSpotifyId = spotifySearch.artists.items[0].id;
+      let artistInfo = await getSpotifyArtistInfo(artistSpotifyId);
 
-      let artistData = await getArtistInfo(clickedArtistId);
-
-      closeLoader();
-      clearNetwork();
-      startNetwork(artistData);
-   }
-
-   // There is already a network, let's add a node to it
-   else {
-      // Search artist on spotify for image
-      let spotifySearch = await quickSearchSpotify(clickedArtistName);
-      let gnImg = "notfound.jpg";
-      if (spotifySearch.artists.items.length > 0) {
-         let artistSpotifyId = spotifySearch.artists.items[0].id;
-         let artistInfo = await getSpotifyArtistInfo(artistSpotifyId);
-
-         if (artistInfo.images.length > 1) {
-            gnImg = artistInfo.images[0].url;
-         }
+      if (artistInfo.images.length > 1) {
+         gnImg = artistInfo.images[0].url;
       }
-
-      // Creates 'ghost node' that follows mouse movement
-      // The size of the node scales according to the current zoom (scale)
-      // of the network
-      ghostNodeHolder = document.createElement("img");
-      ghostNodeHolder.setAttribute("id", "ghostNode");
-      ghostNodeHolder.setAttribute("class", "ghost-node rounded-circle");
-      ghostNodeHolder.setAttribute("width", 320 * network.getScale());
-      ghostNodeHolder.setAttribute("height", 320 * network.getScale());
-      ghostNodeHolder.src = gnImg;
-      ghostNodeHolder.setAttribute("data-artistId", clickedArtistId);
-      document.body.appendChild(ghostNodeHolder);
-
-      document.body.addEventListener("mousemove", e => {
-         onGhostNodeMousemove(e);
-      });
-      ghostNodeHolder.addEventListener("click", e => {
-         onGhostNodeClick(e);
-      });
    }
+
+   // Creates 'ghost node' that follows mouse movement
+   // The size of the node scales according to the current zoom (scale)
+   // of the network
+   ghostNodeHolder = document.createElement("img");
+   ghostNodeHolder.setAttribute("id", "ghostNode");
+   ghostNodeHolder.setAttribute("class", "ghost-node rounded-circle");
+   ghostNodeHolder.setAttribute("width", 320 * network.getScale());
+   ghostNodeHolder.setAttribute("height", 320 * network.getScale());
+   ghostNodeHolder.src = gnImg;
+   ghostNodeHolder.setAttribute("data-artistId", clickedArtistId);
+   document.body.appendChild(ghostNodeHolder);
+
+   document.body.addEventListener("mousemove", e => {
+      onGhostNodeMousemove(e);
+   });
+   ghostNodeHolder.addEventListener("click", e => {
+      onGhostNodeClick(e);
+   });
+
+   displayBtns();
 }
 
 function onGhostNodeMousemove(e) {

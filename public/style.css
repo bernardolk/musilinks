@@ -549,21 +549,6 @@ input {
   margin-bottom: 25px;
 }
 
-#open-search-btn{
-   background-color: rgb(50, 47, 78);
-   border-radius: 50%;
-   border: 3px solid rgb(157, 161, 212);
-   visibility: visible;
-   opacity: 100;
-   width: 80px;
-   height: 80px;
-   top: 30px;
-   left: 30px;
-   position: absolute;
-   z-index: 97;
-   transition: visibility 0.5s linear, opacity 0.5s linear;
-}
-
 #open-tutorial-btn{
    background-color: rgb(50, 47, 78);
    border-radius: 50%;
@@ -574,6 +559,36 @@ input {
    height: 80px;
    left: calc(100% - 30px - 80px);
    top: calc(100% - 30px - 80px);
+   position: absolute;
+   z-index: 97;
+   transition: visibility 0.5s linear, opacity 0.5s linear;
+}
+
+#add-artist-btn{
+   background-color: rgb(50, 47, 78);
+   border-radius: 50%;
+   border: 3px solid rgb(157, 161, 212);
+   visibility: visible;
+   opacity: 100;
+   width: 80px;
+   height: 80px;
+   top: 35px;
+   left: 65px;
+   position: absolute;
+   z-index: 97;
+   transition: visibility 0.5s linear, opacity 0.5s linear;
+}
+
+#open-search-btn{
+   background-color: rgb(50, 47, 78);
+   border-radius: 50%;
+   border: 3px solid rgb(157, 161, 212);
+   visibility: visible;
+   opacity: 100;
+   width: 60px;
+   height: 60px;
+   top: 125px;
+   left: 25px;
    position: absolute;
    z-index: 97;
    transition: visibility 0.5s linear, opacity 0.5s linear;
@@ -663,17 +678,27 @@ input {
       width:100%;
    }
 
-   #open-search-btn{ 
-      width: 55px;
-      height:55px;
-      top: 15px;
-      left: 15px;
-   }
+
+
    #open-tutorial-btn{
       width: 55px;
       height:55px;
       left: calc(100% - 15px - 55px);
       top: calc(100% - 15px - 55px);
+   }
+
+   #add-artist-btn{
+      width: 60px;
+      height: 60px;
+      top: 20px;
+      left: 40px;
+   }
+
+   #open-search-btn{ 
+      width: 40px;
+      height: 40px;
+      top: 90px;
+      left: 20px;
    }
  }
 
