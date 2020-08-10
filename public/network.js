@@ -14,7 +14,6 @@ var mouseY;
 var highlightedNode = null;
 var relArtistList = [];
 
-const relArtistsPerRowInModal = 4;
 const doubleClickInterval = 300;
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -241,34 +240,32 @@ function startNetwork(artistsData) {
 //                                OPEN NODE MODAL
 ////////////////////////////////////////////////////////////////////////////////////////
 async function openNodeModal(params) {
+   hideBtns();
+
    selectedNode = network.body.nodes[params.nodes[0]];
    // Set artist's name as title of the modal
    document.getElementById("node-modal-title").innerHTML =
       selectedNode.options.label;
 
+   // @Attention: NOT best way of doing this.
+   // Just prerender the thing and change the attributes to what's necessary.
+   // MUCH cleaner.
+
    // Creates spotify player
    let spotifyModalElement = document.getElementById("node-modal-player");
 
    let relArtistsBtn = document.createElement("button");
-
    relArtistsBtn.id = "spawn-rel-artists-btn";
    relArtistsBtn.classList.add("modal__btn");
    relArtistsBtn.classList.add("modal__btn-primary");
+   relArtistsBtn.style.marginTop = '20px';
    relArtistsBtn.innerHTML = "Spawn Related Artists!";
-   document.getElementById("node-modal-footer").appendChild(relArtistsBtn);
+   document.getElementById("modal-spotify-footer").appendChild(relArtistsBtn);
 
-   let player = document.createElement("iframe");
-   player.id = "spotify-player";
-   player.src =
-      "https://open.spotify.com/embed/artist/" + selectedNode.options.spotifyId;
-   player.width = "300";
-   player.height = "400";
-   player.frameBorder = "0";
-   player.allowtransparency = "true";
-   player.allow = "encrypted-media";
-   spotifyModalElement.appendChild(player);
-
-
+   // let player = document.createElement("iframe");
+   let player = document.getElementById("iframe-spotify");
+   player.src = "https://open.spotify.com/embed/artist/" + selectedNode.options.spotifyId;
+   player.height = window.innerWidth < 500 ? "80" : "420";
 
    // Opens modal
    MicroModal.show("node-modal", {
@@ -309,15 +306,20 @@ async function openNodeModal(params) {
 
       // Create related artist's image elements
       let newRow;
+      let zIndex = 900;
+      const relArtistsPerRowInModal = window.innerWidth < 500 ? 4 : 5;
       for (let i = 0; i < Object.keys(relArtists).length; i++) {
          if (i % relArtistsPerRowInModal == 0) {
             newRow = document.createElement("div");
             newRow.setAttribute("id", "related-artist-row-" + i);
             newRow.setAttribute("class", "related-artist-row");
+            newRow.style.zIndex = zIndex;
+            zIndex -= 1;
             spotifyRelArtistElement.appendChild(newRow);
          }
 
          let imgContainer = document.createElement("div");
+         imgContainer.setAttribute("data-tooltip", relArtists[i].name);
          imgContainer.setAttribute("class", "related-artist-image-div");
 
          let relArtImg = document.createElement("img");
@@ -326,12 +328,7 @@ async function openNodeModal(params) {
          relArtImg.src = relArtists[i].image;
          relArtImg.innerHTML = relArtists[i].name + " image";
 
-         let relArtLabel = document.createElement("div");
-         relArtLabel.setAttribute("class", "related-artist-image-label");
-         relArtLabel.innerHTML = relArtists[i].name;
-
          imgContainer.appendChild(relArtImg);
-         imgContainer.appendChild(relArtLabel);
          newRow.appendChild(imgContainer);
 
          relArtistList.push({
@@ -423,9 +420,10 @@ const onRelArtistsBtnClick = async function (event) {
 
 
 var onCloseNodeModal = () => {
-   let spotifyPlayerElmnt = document.getElementById("spotify-player");
-   spotifyPlayerElmnt.parentElement.removeChild(spotifyPlayerElmnt);
+   displayBtns();
 
+   //@Attention: better to change existing images than adding/removing
+   //remove images
    let relArtists = Array.from(
       document.getElementsByClassName("related-artist-row")
    );

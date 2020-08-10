@@ -22,15 +22,14 @@
 <body>
 
    <!-- Open Search Button -->
-   <div id="open-search-btn" class="quick-hidden"><img class="icon-img" 
-      src="search_refresh_white.png" />
+   <div id="open-search-btn" class="quick-hidden"><img class="icon-img" src="search_refresh_white.png" />
    </div>
    <!-- Add artist Button -->
    <div id="add-artist-btn" class="quick-hidden"><img class="icon-img" src="search_add.png" />
    </div>
-    <!-- Open tutorial Button -->
-    <div id="open-tutorial-btn" class="quick-hidden"><img class="icon-img" src="help_icon.png" />
-    </div>
+   <!-- Open tutorial Button -->
+   <div id="open-tutorial-btn" class="quick-hidden"><img class="icon-img" src="help_icon.png" />
+   </div>
    <!-- Network -->
    <div id="network-canvas"></div>
 
@@ -121,7 +120,9 @@
                <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
             </header>
             <main class="modal__content" id="tutorial-modal-content">
-               <iframe id="youtube-iframe" width="640" height="480" src="https://www.youtube.com/embed/HUkceRhj5uI" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+               <iframe id="youtube-iframe" width="640" height="480" src="https://www.youtube.com/embed/HUkceRhj5uI"
+                  frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                  allowfullscreen></iframe>
             </main>
             <footer id="tutorial-modal-footer" class="modal__footer"></footer>
          </div>
@@ -180,7 +181,7 @@
    <!-- Artist's information dialog modal -->
    <div class="modal micromodal-slide" id="node-modal" aria-hidden="true">
       <div class="modal__overlay" tabindex="-1" data-micromodal-close>
-         <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="node-modal-title">
+         <div class="artist__modal__container" role="dialog" aria-modal="true" aria-labelledby="node-modal-title">
             <header class="modal__header">
                <h2 class="modal__title" id="node-modal-title">
                   Artist
@@ -188,12 +189,17 @@
                <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
             </header>
             <main class="modal__content" id="node-modal-content">
-               <div class="modal__spotify__player" id="node-modal-player"></div>
-               <div class="modal__spotify__related_artists" id="node-modal-related">
-                  <div id="related-artists-header">Related Artists</div>
+               <div class="responsive-grid">
+                  <div class="modal__spotify__player" id="node-modal-player">
+                     <iframe id="iframe-spotify" src="" width="300" height="380" frameborder="0"
+                        allowtransparency="true" allow="encrypted-media"></iframe>
+                  </div>
+                  <div class="modal__spotify__related_artists" id="node-modal-related">
+                     <div id="related-artists-header">Related Artists</div>
+                  </div>
                </div>
             </main>
-            <footer id="node-modal-footer" class="modal__footer"></footer>
+            <footer id="modal-spotify-footer" style="text-align: center"></footer>
          </div>
       </div>
    </div>
