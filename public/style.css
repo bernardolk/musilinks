@@ -739,6 +739,10 @@ input {
        display: block;
     }
 
+    #info{
+       font-size: 0.8rem;
+    }
+
     .artist__modal__container{
        overflow-x: hidden;
        padding-left: 15px;
