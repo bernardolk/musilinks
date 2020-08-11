@@ -112,7 +112,7 @@
    <!-- TUTORIAL MODAL -->
    <div class="modal micromodal-slide" id="tutorial-modal" aria-hidden="true">
       <div class="modal__overlay" tabindex="-1" data-micromodal-close>
-         <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="node-modal-title">
+         <div class="tutorial__modal__container" role="dialog" aria-modal="true" aria-labelledby="node-modal-title">
             <header class="modal__header">
                <h2 class="modal__title" id="tutorial-modal-title">
                   One-Minute Demo
@@ -120,9 +120,13 @@
                <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
             </header>
             <main class="modal__content" id="tutorial-modal-content">
-               <iframe id="youtube-iframe" width="640" height="480" src="https://www.youtube.com/embed/HUkceRhj5uI"
-                  frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                  allowfullscreen></iframe>
+               <div class="iframe_container">
+                  <div class="resp-container">
+                     <iframe id="youtube-iframe" src="https://www.youtube.com/embed/HUkceRhj5uI" frameborder="0"
+                        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen></iframe>
+                  </div>
+               </div>
             </main>
             <footer id="tutorial-modal-footer" class="modal__footer"></footer>
          </div>

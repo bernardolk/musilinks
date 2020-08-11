@@ -123,11 +123,10 @@ body {
   align-items: center;
 }
 
-.modal__container {
+.tutorial__modal__container {
   background-color: #1a2636;
   padding: 30px;
-  max-width: 700px;
-  max-height: 70vh;
+  width: 70vh;
   border-radius: 4px;
   box-sizing: border-box;
 }
@@ -705,6 +704,26 @@ input {
    font-weight: 700;
 }
 
+.iframe_container{
+   display:block;
+   padding: 10%;
+}
+
+#youtube-iframe{
+   position: absolute;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   border: 0;
+}
+
+.resp-container {
+   position: relative;
+   overflow: hidden;
+   padding-top: 56.25%;
+}
+
 
 /* 
 
@@ -734,6 +753,15 @@ input {
    grid-template-columns: 1fr 1.5fr;
 }
 
+@media (max-height: 850px){
+   #spawn-rel-artists-btn{
+      margin-top: 0px !important;
+   }
+   .artist__modal__container{
+      max-height: unset;
+   }
+}
+
  @media (max-width: 700px){
     .responsive-grid{
        display: block;
@@ -761,10 +789,6 @@ input {
        width: 300px;
     }
 
-    /* #spawn-rel-artists-btn{
-       margin: 0;
-    } */
-
     #node-modal-content{
        margin-bottom: 0;
     }
@@ -778,7 +802,7 @@ input {
       padding: 15px;
    }
 
-   .modal__container{
+   .tutorial__modal__container{
       width: 95%;
       padding: 15px;
       max-height: 70vh;
@@ -789,22 +813,16 @@ input {
       font-size: 2.5rem;
    }
 
-   #tutorial-modal{
+   /* #tutorial-modal{
       width: 95%;
       padding: 15px;
       height: 70%;
-   } 
+   }  */
 
-   #youtube-iframe{
-      width: 100%;
-      height: 70%;
-   }
 
    #spotify-player{
       width:100%;
    }
-
-
 
    #open-tutorial-btn{
       width: 55px;
@@ -827,6 +845,7 @@ input {
       left: 20px;
    }
  }
+
 
 @media (max-width: 700px), (orientation: landscape) and (max-height: 500px){
    .main__modal__content{
@@ -851,6 +870,13 @@ input {
    .main__modal__container{
       padding-top: 10px;
    }
+
+   .iframe_container{
+      display:block;
+      width: 80vh;
+      height: 80vh;
+   }
+
 }
 
 @media (orientation: landscape) and (max-height: 320px){
