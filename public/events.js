@@ -112,7 +112,7 @@ function closeLoader() {
 const onMainModalClose = () => {
    mainModalOpen = false;
    searchBar.value = "";
-   if(!showTutorial){
+   if (!showTutorial) {
       displayBtns();
    }
 };
@@ -155,13 +155,20 @@ const onMainModalShow = () => {
    }
 };
 
-const onHelpModalShow = function () {
-   // MicroModal.close("main-modal");
-   MicroModal.show("help-modal");
+const onClickHelp = function () {
+   MicroModal.close("main-modal");
+   MicroModal.show("help-modal", {
+      onShow: () => hideBtns(),
+      onClose: () => MicroModal.show("main-modal") });
 };
 
+
+function onHelpModalClose(){
+   MicroModal.show("main-modal");
+}
+
 const helpIcon = document.getElementById("help-icon");
-helpIcon.addEventListener("click", e => onHelpModalShow(e));
+helpIcon.addEventListener("click", e => onClickHelp(e));
 
 // ---------------------------------------------
 //               document events
