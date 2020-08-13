@@ -47,6 +47,7 @@
             <h2 class="main__modal__title" id="main-modal-title">
                Musilinks
             </h2>
+
             <main class="main__modal__content" id="main-modal-content">
                <form id="main-form">
                   <span id="mobile-main-modal-text">
@@ -55,53 +56,41 @@
                      placeholder="start typing an artist, band member or musical group..." />
                </form>
             </main>
+
             <footer class="main__modal__footer">
                <div id="main-modal-icons">
+
                   <a target="_blank" rel="noopener noreferrer"
                      href="https://www.linkedin.com/in/bernardo-knackfuss-019935124/?locale=en_US">
-                     <div class="tooltip">
-                        <span class="tooltiptext">
-                           My LinkedIn page, if you wish to get in touch</span>
-                        <div id="linkedin-icon" class="placeholder-icon placeholder-icon-left">
-                           <img class="icon-img" src="linkedin_icon.png" />
-                        </div>
-                     </div>
-                  </a>
-                  <a href="mailto:bernardo.knackfuss@gmail.com">
-                     <div class="tooltip">
-                        <span class="tooltiptext">
-                           Have feedback? Bug report, feature wish? Send me an
-                           email!</span>
-                        <div id="email-icon" class="placeholder-icon placeholder-icon-left">
-                           <img class="icon-img" src="email_icon.png" />
-                        </div>
-                     </div>
-                  </a>
-                  <a target="_blank" rel="noopener noreferrer" href="https://github.com/bernardolk/musilinks">
-                     <div class="tooltip">
-                        <span class="tooltiptext">
-                           Github page (yup, open source)</span>
-                        <div id="github-icon" class="placeholder-icon placeholder-icon-left">
-                           <img class="icon-img" src="github_icon.png" />
-                        </div>
-                     </div>
-                  </a>
-                  <a target="_blank" rel="noopener noreferrer" href="https://github.com/bernardolk/musilinks">
-                     <div class="tooltip">
-                        <span class="tooltiptext tooltiptext-r" id="shareTooltip">
-                           Share this!</span>
-                        <div class="placeholder-icon placeholder-icon-left">
-                           <img class="icon-img" src="share.png" />
-                        </div>
+                     <div id="linkedin-icon" class="placeholder-icon placeholder-icon-left"
+                        data-tooltip="My LinkedIn page, if you wish to get in touch">
+                        <img class="icon-img" src="linkedin_icon.png" />
                      </div>
                   </a>
 
-                  <div class="tooltip">
-                     <span class="tooltiptext tooltiptext-r" id="helpTooltip">
-                        How does this work?</span>
-                     <div id="help-icon" class="placeholder-icon placeholder-icon-right">
-                        <img class="icon-img" src="help_icon.png" />
+                  <a href="mailto:bernardo.knackfuss@gmail.com">
+                     <div id="email-icon" class="placeholder-icon placeholder-icon-left" data-tooltip="Have feedback? Bug report, feature wish? Send me an
+                           email!">
+                        <img class="icon-img" src="email_icon.png" />
                      </div>
+                  </a>
+
+                  <a target="_blank" rel="noopener noreferrer" href="https://github.com/bernardolk/musilinks">
+                     <div id="github-icon" class="placeholder-icon placeholder-icon-left"
+                        data-tooltip="This project's Github page">
+                        <img class="icon-img" src="github_icon.png" />
+                     </div>
+                  </a>
+
+                  <!-- <a target="_blank" rel="noopener noreferrer" href="https://github.com/bernardolk/musilinks">
+                     <div class="placeholder-icon placeholder-icon-left" data-tooltip="Share this!">
+                        <img class=" icon-img" src="share.png" />
+                     </div>
+                  </a> -->
+
+                  <div id="help-icon" class="placeholder-icon placeholder-icon-right"
+                     data-tooltip="How does this work?">
+                     <img class="icon-img" src="help_icon.png" />
                   </div>
                </div>
             </footer>
