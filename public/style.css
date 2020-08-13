@@ -784,7 +784,7 @@ input {
    /*max-height: 45%;*/
    border-radius: 45px;
    box-sizing: border-box;
-   overflow: scroll;
+   overflow-y: auto;
  }
 
  .help__modal__title {

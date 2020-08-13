@@ -370,6 +370,9 @@ function closeAllLists() {
    }
 }
 
+///////////////////////////////////////
+//    ON ADD NODE BUTTON CLICK
+///////////////////////////////////////
 async function onClickAddItem(e) {
    e.stopPropagation();
 
