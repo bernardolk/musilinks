@@ -23,12 +23,18 @@ var getArtistInfo = async function (artistId) {
       let relCounter = 0;
       let spotifyPromises = [];
       let artistsSpotifyIds = [];
+      let relTypes = ["member of band"];
+
+      // if little nodes... put some collaborators too in the mix
+      if (artistData.relations.filter(x => x.type === "member of band").length < 2) {
+         relTypes.push("collaboration");
+      }
 
       // scan related artists
       for (let i = 0; i < relLength; i++) {
          if (
             !idList.includes(artistData.relations[i].artist.id) &&
-            artistData.relations[i].type == "member of band"
+            relTypes.includes(artistData.relations[i].type)
          ) {
             idList.push(artistData.relations[i].artist.id);
             response.relations[relCounter] = artistData.relations[i];
@@ -121,16 +127,17 @@ var getArtistInfo = async function (artistId) {
       let relationsLength = response.relations.length;
       let resCounter = 0;
       for (let i = 0; i < relationsLength; i++) {
-         if (response.relations[i].type == "member of band") {
-            finalResponse.relatedArtists[resCounter] = {
-               name: response.relations[i].artist.name,
-               id: response.relations[i].artist.id,
-               image: response.relations[i].spotify.image,
-               spotifyId: response.relations[i].spotify.id
-            };
-            resCounter++;
-         }
+         finalResponse.relatedArtists[resCounter] = {
+            name: response.relations[i].artist.name,
+            id: response.relations[i].artist.id,
+            image: response.relations[i].spotify.image,
+            spotifyId: response.relations[i].spotify.id
+         };
+         resCounter++;
       }
+
+      //OMG bad code
+
 
       // Main artist's data
       finalResponse.artist = {

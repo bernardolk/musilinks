@@ -147,7 +147,7 @@ function startNetwork(artistsData) {
 
                let artistData = await getArtistInfo(artistId);
                let options = { edges: { color: defaultColor } };
-               renderCluster(releasedNodeId, artistData.relatedArtists, options);
+               renderCluster(releasedNodeId, artistData.relatedArtists, options, true);
             }
          }
       }
@@ -446,13 +446,13 @@ var onCloseNodeModal = () => {
 //                               RENDER CLUSTER
 ////////////////////////////////////////////////////////////////////////////////////////
 // Create related artists nodes (cluster)
-function renderCluster(targetNodeId, relatedArtists, options) {
+function renderCluster(targetNodeId, relatedArtists, options, wasDragged) {
    let numberOfArtists = Object.keys(relatedArtists).length;
 
    let targetNode = network.body.nodes[targetNodeId];
 
    // Only has it's parent node as a related artist
-   if (numberOfArtists <= 1) {
+   if (wasDragged && numberOfArtists <= 1) {
       targetNode.setOptions({ color: { border: noRelatedArtistsColor } });
       return;
    }
