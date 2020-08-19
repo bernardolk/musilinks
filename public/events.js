@@ -15,6 +15,7 @@ var networkElement = document.getElementById("network-canvas");
 var bounds = networkElement.getBoundingClientRect();
 var showTutorial = true;
 var searchMode = 'CREATE';
+var noRelatedArtists = false;
 
 // ---------------------------------------------
 //             authenticate client
@@ -92,21 +93,19 @@ function showLoader() {
 }
 
 
+function displayTooltip(){
+   const infoTooltip = document.getElementById("info-container");
+   infoTooltip.classList.remove("hidden");
+   infoTooltip.classList.add("visible");
+   setTimeout(function () {
+      infoTooltip.classList.remove("visible");
+      infoTooltip.classList.add("hidden");
+   }, 5000);
+}
+
+
 function closeLoader() {
    MicroModal.close("loading-modal");
-   //Displays a little bar on the screen. Don't display it if tutorial was recently displayed.
-   if (!helpPopUpDisplayed && !showTutorial) {
-      const infoTooltip = document.getElementById("info-container");
-      infoTooltip.classList.remove("hidden");
-      infoTooltip.classList.add("visible");
-      // infoTooltip.style.visibility = "visible";
-      setTimeout(function () {
-         infoTooltip.classList.remove("visible");
-         infoTooltip.classList.add("hidden");
-         // infoTooltip.style.visibility = "hidden";
-      }, 5000);
-      helpPopUpDisplayed = true;
-   }
 }
 
 const onMainModalClose = () => {
@@ -341,6 +340,7 @@ async function onClickItem(e) {
          .getAttribute("data-artistid");
    }
 
+
    MicroModal.close("main-modal");
 
    closeAllLists();
@@ -348,12 +348,23 @@ async function onClickItem(e) {
    let resJSON = await getArtistInfo(artistId);
    closeLoader();
 
+   noRelatedArtists = Object.keys(resJSON.relatedArtists).length === 0 ? true : false;
+
    if (showTutorial) {
       MicroModal.show("tutorial-modal", {
-         onClose: displayBtns
+         onClose: () => {
+            if(noRelatedArtists)
+               displayTooltip();
+            displayBtns();
+         }
       });
       showTutorial = false;
       window.localStorage.setItem("musilinks_tutorial", "DONE");
+   }
+   else if (noRelatedArtists) {
+      displayTooltip();
+      noRelatedArtists = false;
+      displayBtns();
    }
    else {
       displayBtns();
