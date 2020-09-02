@@ -12,7 +12,7 @@ var getArtistInfo = async function (artistId) {
    if (!artistData.error) {
       // return object
       let response = {
-         relations: [{ spotify: { image: "notfound.jpg", id: "" } }]
+         relations: []
       };
 
       // constructs the relations array of objects, filtering duplicate results
