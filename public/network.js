@@ -4,15 +4,15 @@
 // @bernardolk - Bernardo Knackfuss 2019 - 2020
 ////////////////////////////////////////////////////////////////////////////////////////
 
-var nodes = null;
-var edges = null;
-var network = null;
-var nodeIds = [];
-var selectedNode;
-var mouseX;
-var mouseY;
-var highlightedNode = null;
-var relArtistList = [];
+var NodeList = null;
+var EdgeList = null;
+var Network = null;
+var NodeIds = [];
+var SelectedNode;
+var MouseX;
+var MouseY;
+var HighlightedNode = null;
+var RelatedArtistList = [];
 
 const doubleClickInterval = 300;
 
@@ -61,15 +61,15 @@ MicroModal.init();
 // Called when the Visualization API is loaded.
 function startNetwork(artistsData) {
    let maxRepulsionMode = false;
-   nodeIds = [];
-   nodes = new vis.DataSet();
-   edges = new vis.DataSet();
+   NodeIds = [];
+   NodeList = new vis.DataSet();
+   EdgeList = new vis.DataSet();
 
    let container = document.getElementById("network-canvas");
 
    let data = {
-      nodes: nodes,
-      edges: edges
+      nodes: NodeList,
+      edges: EdgeList
    };
 
    let options = {
@@ -102,7 +102,7 @@ function startNetwork(artistsData) {
       }
    };
 
-   network = new vis.Network(container, data, options);
+   Network = new vis.Network(container, data, options);
 
    createNode(artistsData, null, null);
 
@@ -110,8 +110,8 @@ function startNetwork(artistsData) {
    //        Event Listeners
    //-------------------------------------------------
 
-   network.once("startStabilizing", function () {
-      network.moveTo({
+   Network.once("startStabilizing", function () {
+      Network.moveTo({
          scale: 0.5,
          animation: {
             duration: 1000,
@@ -120,10 +120,10 @@ function startNetwork(artistsData) {
       });
    });
 
-   network.on("dragEnd", async function (params) {
+   Network.on("dragEnd", async function (params) {
       if (params.nodes.length > 0 && params.edges.length > 0) {
          let releasedNodeId = params.nodes[0];
-         let releasedNode = network.body.nodes[releasedNodeId];
+         let releasedNode = Network.body.nodes[releasedNodeId];
 
          // checks if user isnt dragging a fixed node (dont create links for those)
          // Also checks if this node was found in MB database (if it was, then it's id [MBID]
@@ -139,7 +139,7 @@ function startNetwork(artistsData) {
                let artistId = releasedNode.options.artistId;
 
                // Augment original node edge length upon release
-               network.body.edges[params.edges[0]].setOptions({
+               Network.body.edges[params.edges[0]].setOptions({
                   length: largerEdgeLegth
                });
                // Change properties of node upon release as well
@@ -147,13 +147,13 @@ function startNetwork(artistsData) {
 
                let artistData = await getArtistInfo(artistId);
                let options = { edges: { color: defaultColor } };
-               renderCluster(releasedNodeId, artistData.relatedArtists, options, true);
+               renderCluster(releasedNodeId, artistData.relations, options, true);
             }
          }
       }
    });
 
-   network.on("click", function (params) {
+   Network.on("click", function (params) {
       var clickTime = new Date();
 
       if (clickTime - doubleClickTime > doubleClickInterval) {
@@ -167,15 +167,15 @@ function startNetwork(artistsData) {
 
    function onClick(params) {
       if (params.nodes.length > 0) {
-         highlightedNode = network.body.nodes[params.nodes[0]];
+         HighlightedNode = Network.body.nodes[params.nodes[0]];
       } else {
-         highlightedNode = null;
+         HighlightedNode = null;
       }
    }
 
    var doubleClickTime = 0;
 
-   network.on("doubleClick", function (params) {
+   Network.on("doubleClick", function (params) {
       doubleClickTime = new Date();
 
       // user double clicked on a node
@@ -185,50 +185,50 @@ function startNetwork(artistsData) {
       }
       // user double clicked outside a node (empty space)
       else {
-         if (!highlightedNode) {
+         if (!HighlightedNode) {
             if (!maxRepulsionMode) {
-               network.setOptions({
+               Network.setOptions({
                   physics: { repulsion: { nodeDistance: maxRepulsion } }
                });
                maxRepulsionMode = true;
             }
             else {
-               network.setOptions({
+               Network.setOptions({
                   physics: { repulsion: { nodeDistance: minRepulsion } }
                });
                maxRepulsionMode = false;
             }
          }
          else {
-            if (highlightedNode.options.fixed.x == false
-               && highlightedNode.options.fixed.y == false) {
+            if (HighlightedNode.options.fixed.x == false
+               && HighlightedNode.options.fixed.y == false) {
                // user clicked on a node and now is double clicking outside it
-               let canvasCoords = network.DOMtoCanvas({ x: mouseX, y: mouseY });
+               let canvasCoords = Network.DOMtoCanvas({ x: MouseX, y: MouseY });
 
                // saves node styling options before fixing it so we can restore
                // those later when we unfix it 
-               let originalColor = highlightedNode.options.color.border;
-               let originalBorderWidth = highlightedNode.options.borderWidth;
+               let originalColor = HighlightedNode.options.color.border;
+               let originalBorderWidth = HighlightedNode.options.borderWidth;
 
-               highlightedNode.setOptions({
+               HighlightedNode.setOptions({
                   x: canvasCoords.x,
                   y: canvasCoords.y,
                   originalColor: originalColor,
                   originalBorderWidth: originalBorderWidth
                });
 
-               highlightedNode.setOptions(fixedNodeOptions);
-               network.startSimulation();
+               HighlightedNode.setOptions(fixedNodeOptions);
+               Network.startSimulation();
             }
             else {
-               highlightedNode.setOptions({
+               HighlightedNode.setOptions({
                   ...unfixedNodeOptions,
-                  color: { border: highlightedNode.options.originalColor },
-                  borderWidth: highlightedNode.options.originalBorderWidth
+                  color: { border: HighlightedNode.options.originalColor },
+                  borderWidth: HighlightedNode.options.originalBorderWidth
                });
-               network.startSimulation();
+               Network.startSimulation();
             }
-            highlightedNode = null;
+            HighlightedNode = null;
          }
       }
    });
@@ -242,18 +242,16 @@ function startNetwork(artistsData) {
 async function openNodeModal(params) {
    hideBtns();
 
-   selectedNode = network.body.nodes[params.nodes[0]];
+   SelectedNode = Network.body.nodes[params.nodes[0]];
    // Set artist's name as title of the modal
    document.getElementById("node-modal-title").innerHTML =
-      selectedNode.options.label;
+      SelectedNode.options.label;
 
    // @Attention: NOT best way of doing this.
    // Just prerender the thing and change the attributes to what's necessary.
    // MUCH cleaner.
 
    // Creates spotify player
-   let spotifyModalElement = document.getElementById("node-modal-player");
-
    let relArtistsBtn = document.createElement("button");
    relArtistsBtn.id = "spawn-rel-artists-btn";
    relArtistsBtn.classList.add("modal__btn");
@@ -264,7 +262,7 @@ async function openNodeModal(params) {
 
    // let player = document.createElement("iframe");
    let player = document.getElementById("iframe-spotify");
-   player.src = "https://open.spotify.com/embed/artist/" + selectedNode.options.spotifyId;
+   player.src = "https://open.spotify.com/embed/artist/" + SelectedNode.options.spotifyId;
    player.height = window.innerWidth < 500 ? "80" : "420";
 
    // Opens modal
@@ -272,18 +270,16 @@ async function openNodeModal(params) {
       onClose: onCloseNodeModal
    });
 
-   if (selectedNode.options.spotifyId) {
+   if (SelectedNode.options.spotifyId) {
 
       let spotifyRelArtistElement = document.getElementById("node-modal-related");
 
       // fetch data from spotify
-      let spotifyRelArtists = await getRelatedArtists(
-         selectedNode.options.spotifyId
-      );
+      let spotifyRelArtists = await getRelatedArtists(SelectedNode.options.spotifyId);
 
       // let relArtistsBtn = document.getElementById("spawn-rel-artists-btn");
 
-      if (selectedNode.options.relArtistsCreated) {
+      if (SelectedNode.options.relArtistsCreated) {
          relArtistsBtn.style.backgroundColor = "grey";
       }
 
@@ -295,12 +291,13 @@ async function openNodeModal(params) {
       for (let i = 0; i < relLength; i++) {
          relArtists[i] = {
             name: spotifyRelArtists.artists[i].name,
-            spotifyId: spotifyRelArtists.artists[i].id,
-            genres: spotifyRelArtists.artists[i].genres,
-            image: "notfound.jpg"
+            spotify: {
+               id: spotifyRelArtists.artists[i].id,
+               image: "notfound.jpg"
+            }
          };
          if (spotifyRelArtists.artists[i].images.length > 0) {
-            relArtists[i].image = spotifyRelArtists.artists[i].images[0].url;
+            relArtists[i].spotify.image = spotifyRelArtists.artists[i].images[0].url;
          }
       }
 
@@ -325,16 +322,16 @@ async function openNodeModal(params) {
          let relArtImg = document.createElement("img");
          relArtImg.setAttribute("id", "rel-artist-img-" + i);
          relArtImg.setAttribute("class", "rounded-circle related-artist-image");
-         relArtImg.src = relArtists[i].image;
+         relArtImg.src = relArtists[i].spotify.image;
          relArtImg.innerHTML = relArtists[i].name + " image";
 
          imgContainer.appendChild(relArtImg);
          newRow.appendChild(imgContainer);
 
-         relArtistList.push({
-            spotifyId: relArtists[i].spotifyId,
+         RelatedArtistList.push({
+            spotifyId: relArtists[i].spotify.id,
             name: relArtists[i].name,
-            img: relArtists[i].image
+            img: relArtists[i].spotify.image
          });
       }
    }
@@ -342,80 +339,78 @@ async function openNodeModal(params) {
 
 
 ////////////////////////////////////////////////////////////////////////////////////////
-//                                onRelArtistsBtnClick
+//                          ON CLICK SPAWN RELATED ARTIST BUTTON
 ////////////////////////////////////////////////////////////////////////////////////////
-const onRelArtistsBtnClick = async function (event) {
-   //Searches Music Brainz for all artists at once
-   //It is possible that we get repeated results
-   //For instance, Alice Cooper is both a Person and a Group
-   //In that case, we always store the group (if found first)
-   //If we find a Person type before a group, we save it and keep
-   //scanning for a group. If a group is not found for that artist
-   //then we use the Person type MBID (MusicBrainz ID).
 
+//Searches Music Brainz for all artists at once
+//It is possible that we get repeated results
+//For instance, Alice Cooper is both a Person and a Group
+//In that case, we always store the group (if found first)
+//If we find a Person type before a group, we save it and keep
+//scanning for a group. If a group is not found for that artist
+//then we use the Person type MBID (MusicBrainz ID).
+const onRelArtistsBtnClick = async function (event) {
    event.stopPropagation();
 
-   if (selectedNode.options.relArtistsCreated) {
+   if (SelectedNode.options.relArtistsCreated) {
       MicroModal.close("node-modal");
-   } else {
-      let mbQuery = "";
-      for (let i = 0; i < relArtistList.length; i++) {
-         if (i > 0) {
-            mbQuery += "+";
-         }
-         mbQuery += "%22" + encodeURIComponent(relArtistList[i].name) + "%22";
-      }
-
-      // console.log(mbQuery);
-
-      let searchResults = await searchMusicBrainz(mbQuery, 100);
-
-      // console.log(searchResults);
-
-      let relatedArtists = [];
-      let scannedNames = [];
-      for (let j = 0; j < relArtistList.length; j++) {
-         // As a default, spotify rel MBID (id) is his name, so to uniquely identify it
-         // in the network even if we don't find any match.
-         relatedArtists[j] = {
-            id: relArtistList[j].name,
-            spotifyId: relArtistList[j].spotifyId,
-            image: relArtistList[j].img,
-            name: relArtistList[j].name
-         };
-         for (let i = 0; i < Object.keys(searchResults.artists).length; i++) {
-            if (searchResults.artists[i].name.toUpperCase() 
-                  === relArtistList[j].name.toUpperCase()) {
-               if (searchResults.artists[i].type === "Group") {
-                  relatedArtists[j].id = searchResults.artists[i].id;
-                  break;
-               }
-               else if (searchResults.artists[i].type === "Person") {
-                  scannedNames.push({
-                     name: searchResults.artists[i].name,
-                     id: searchResults.artists[i].id
-                  });
-                  // If person is found first, do not stop. Just add to list of scanned names
-               }
-            }
-         }
-         // If no group match is found, check scanned names list for a 'person' type match
-         if (relatedArtists[j].id === relArtistList[j].name) {
-            for (let k = 0; k < scannedNames.length; k++) {
-               if (scannedNames[k].name == relatedArtists[j].name) {
-                  relatedArtists[j].id = scannedNames[k].id;
-               }
-            }
-         }
-      }
-
-      let options = { edges: { color: relatedArtistEdgeColor } };
-
-      selectedNode.setOptions({ relArtistsCreated: true });
-      MicroModal.close("node-modal");
-
-      renderCluster(selectedNode.options.id, relatedArtists, options);
+      return;
    }
+
+   // construct search query
+   let mbQuery = "";
+   RelatedArtistList.forEach((artist, i) => {
+      if (i > 0) {
+         mbQuery += "+";
+      }
+      mbQuery += `%22${encodeURIComponent(artist.name)}%22`;
+   });
+
+   let searchResults = await searchMusicBrainz(mbQuery, 100);
+
+   let musicBrainzArtists = Object.keys(searchResults.artists)
+      .map((key) => searchResults.artists[key]);
+
+   let relations = [];
+
+   RelatedArtistList.forEach((relatedArtist) => {
+      let relation = {
+         spotify: {
+            id: relatedArtist.spotifyId,
+            image: relatedArtist.img,
+         },
+         name: relatedArtist.name,
+         id: null
+      };
+
+      let id, personId = null;
+      musicBrainzArtists.forEach((musicBrainzArtist) => {
+         if (musicBrainzArtist.name.toUpperCase() === relatedArtist.name.toUpperCase()) {
+            if (musicBrainzArtist.type === "Group") {
+               id = musicBrainzArtist.id;
+            }
+            else if (musicBrainzArtist.type === "Person") {
+               personId = musicBrainzArtists.id;
+            }
+         }
+      });
+
+      // If no group match is found, check scanned names list for a 'person' type match
+      if(!id && personId){
+         id = personId;
+      }
+      if (id) {
+         relation.id = id;
+         relations.push(relation);
+      }
+   });
+
+
+   let options = { edges: { color: relatedArtistEdgeColor } };
+   SelectedNode.setOptions({ relArtistsCreated: true });
+   MicroModal.close("node-modal");
+
+   renderCluster(SelectedNode.options.id, relations, options);
 };
 
 
@@ -432,7 +427,7 @@ var onCloseNodeModal = () => {
       target.removeChild(relArtists[i]);
    }
 
-   relArtistList = [];
+   RelatedArtistList = [];
    document
       .getElementById("spawn-rel-artists-btn")
       .removeEventListener("click", onRelArtistsBtnClick);
@@ -449,7 +444,7 @@ var onCloseNodeModal = () => {
 function renderCluster(targetNodeId, relatedArtists, options, wasDragged) {
    let numberOfArtists = Object.keys(relatedArtists).length;
 
-   let targetNode = network.body.nodes[targetNodeId];
+   let targetNode = Network.body.nodes[targetNodeId];
 
    // Only has it's parent node as a related artist
    if (wasDragged && numberOfArtists <= 1) {
@@ -458,37 +453,37 @@ function renderCluster(targetNodeId, relatedArtists, options, wasDragged) {
    }
 
    for (let i = 0; i < numberOfArtists; i++) {
-      let lastNodeId = nodeIds[nodeIds.length - 1];
+      let lastNodeId = NodeIds[NodeIds.length - 1];
       let duplicatedNode = null;
 
       // checks the entire network for an identical node
       for (let j = 0; j <= lastNodeId; j++) {
-         if (network.body.nodes[j].options.artistId === relatedArtists[i].id) {
-            duplicatedNode = network.body.nodes[j];
+         if (Network.body.nodes[j].options.artistId === relatedArtists[i].id) {
+            duplicatedNode = Network.body.nodes[j];
             break;
          }
       }
 
       // if node does not already exists in network
       if (duplicatedNode == null) {
-         nodes.add({
+         NodeList.add({
             id: lastNodeId + 1,
             artistId: relatedArtists[i].id,
-            spotifyId: relatedArtists[i].spotifyId,
+            spotifyId: relatedArtists[i].spotify.id,
             membersCreated: false,
             relArtistsCreated: false,
             label: relatedArtists[i].name,
-            image: relatedArtists[i].image,
+            image: relatedArtists[i].spotify.image,
             x: targetNode.x,
             y: targetNode.y
          });
 
-         edges.add({
+         EdgeList.add({
             from: targetNodeId,
             to: lastNodeId + 1,
             color: { color: options.edges.color }
          });
-         nodeIds.push(lastNodeId + 1);
+         NodeIds.push(lastNodeId + 1);
       }
 
       // if node already exists in network, we will only create a new link
@@ -506,7 +501,7 @@ function renderCluster(targetNodeId, relatedArtists, options, wasDragged) {
          }
          // If it's not already created, creates it
          if (!linkAlreadyCreated) {
-            edges.add({
+            EdgeList.add({
                from: targetNodeId,
                to: duplicatedNode.options.id,
                color: { color: options.edges.color }
@@ -521,12 +516,12 @@ function renderCluster(targetNodeId, relatedArtists, options, wasDragged) {
 ////////////////////////////////////////////////////////////////////////////////////////
 // Destroy network. Used when starting over the graph.
 function clearNetwork() {
-   if (network !== null) {
-      network.destroy();
-      nodes = null;
-      edges = null;
-      nodeIds = [];
-      network = null;
+   if (Network !== null) {
+      Network.destroy();
+      NodeList = null;
+      EdgeList = null;
+      NodeIds = [];
+      Network = null;
    }
 }
 
@@ -536,8 +531,8 @@ function clearNetwork() {
 ////////////////////////////////////////////////////////////////////////////////////////
 function createNode(artistsData, Xo, Yo) {
    let lastNodeId;
-   if (nodeIds.length > 0) {
-      lastNodeId = nodeIds[nodeIds.length - 1];
+   if (NodeIds.length > 0) {
+      lastNodeId = NodeIds[NodeIds.length - 1];
    } else {
       lastNodeId = -1;
    }
@@ -546,16 +541,18 @@ function createNode(artistsData, Xo, Yo) {
    let mainArtistNode = null;
 
    for (let j = 0; j <= lastNodeId; j++) {
-      if (network.body.nodes[j].options.artistId == artistsData.artist.id) {
-         mainArtistNode = network.body.nodes[j];
+      if (Network.body.nodes[j].options.artistId == artistsData.artist.id) {
+         mainArtistNode = Network.body.nodes[j];
          break;
       }
    }
 
    // if node does not already exists in network
    if (mainArtistNode === null) {
-      nodes.add({
-         id: lastNodeId + 1,
+      let newNodeId = lastNodeId + 1;
+
+      NodeList.add({
+         id: newNodeId,
          shape: "circularImage",
          image: artistsData.artist.image,
          label: artistsData.artist.name,
@@ -574,18 +571,23 @@ function createNode(artistsData, Xo, Yo) {
          borderWidth: largerBorderWidth
       });
 
-      nodeIds.push(lastNodeId + 1);
-      renderCluster(lastNodeId + 1, artistsData.relatedArtists,
-         { edges: { color: defaultColor } });
+      NodeIds.push(newNodeId);
+      renderCluster(newNodeId, artistsData.relations, { edges: { color: defaultColor } });
    }
-
    // if it exists, then we just create the relevant nodes around it
    else {
       if (!mainArtistNode.options.membersCreated) {
+
+         // Augment node and node edge's and release it if fixed
+         Network.body.edges[mainArtistNode.edges[0].id].setOptions({
+            length: largerEdgeLegth
+         });
+         mainArtistNode.setOptions(releasedNodeOptions);
+
          let options = { edges: { color: defaultColor } };
          renderCluster(
             mainArtistNode.options.id,
-            artistsData.relatedArtists,
+            artistsData.relations,
             options
          );
       }

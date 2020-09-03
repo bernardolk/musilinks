@@ -147,7 +147,7 @@ const onMainModalShow = () => {
 
    hideBtns();
 
-   if (network) {
+   if (Network) {
       document
          .getElementById("main-modal__overlay")
          .setAttribute("data-micromodal-close", "");
@@ -185,8 +185,8 @@ helpIcon.addEventListener("click", e => onClickHelp(e));
 // };
 
 document.onmousemove = function (e) {
-   mouseX = e.clientX - bounds.left;
-   mouseY = e.clientY - bounds.top;
+   MouseX = e.clientX - bounds.left;
+   MouseY = e.clientY - bounds.top;
 };
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -232,32 +232,38 @@ let debouncedSearch = _.debounce(async function () {
 
       // construct list of artist search results
       for (let i = 0; i < Object.keys(artistList).length; i++) {
-         let acItemElmnt = document.createElement("DIV");
+         let itemDivElement = document.createElement("DIV");
+
          if (artistList[i].description) {
-            acItemElmnt.innerHTML =
-               artistList[i].name + " - <i>" + artistList[i].description + "</i>";
-         } else {
-            acItemElmnt.innerHTML = artistList[i].name;
+            itemDivElement.innerHTML = `${artistList[i].name} - <i>${artistList[i].description}</i>`;
+         } 
+         else {
+            itemDivElement.innerHTML = artistList[i].name;
          }
-         acItemElmnt.innerHTML +=
-            "<input type='hidden' value='" +
-            artistList[i].name +
-            "' data-artistid='" +
-            artistList[i].id +
-            "'>";
+
+         let itemInputElement = document.createElement("INPUT");
+         itemInputElement.setAttribute("data-artistid", artistList[i].id);
+         itemInputElement.setAttribute("data-artistname", artistList[i].name);
+         itemInputElement.setAttribute("type", "hidden");
+         itemDivElement.appendChild(itemInputElement);
+
+         // acItemElmnt.innerHTML +=
+         //    `<input type='hidden' value='${artistList[i].name}' 
+         //    data-artistid='${artistList[i].id}'
+         //    data-artistname='${artistList[i].name}'>`;
 
          // On search item click
          if (searchMode === 'CREATE') {
-            acItemElmnt.addEventListener("click", e => onClickItem(e));
+            itemDivElement.addEventListener("click", e => onClickItem(e));
          }
          else if (searchMode === 'ADD') {
-            acItemElmnt.addEventListener("click", e => onClickAddItem(e));
+            itemDivElement.addEventListener("click", e => onClickAddItem(e));
          }
          else {
             console.log('searchMode is in an invalid state. Check where this variable is set.');
          }
 
-         acContainerElmnt.appendChild(acItemElmnt);
+         acContainerElmnt.appendChild(itemDivElement);
       }
    }
 }, debounceInterval);
@@ -324,6 +330,11 @@ function autocomplete(searchBar) {
    });
 }
 
+
+
+///////////////////////////////////////////
+//    ON CLICK ARTIST NAME AUTOCOMPLETE
+///////////////////////////////////////////
 async function onClickItem(e) {
    e.stopPropagation();
 
@@ -348,7 +359,7 @@ async function onClickItem(e) {
    let resJSON = await getArtistInfo(artistId);
    closeLoader();
 
-   noRelatedArtists = Object.keys(resJSON.relatedArtists).length === 0 ? true : false;
+   noRelatedArtists = Object.keys(resJSON.relations).length === 0 ? true : false;
 
    if (showTutorial) {
       MicroModal.show("tutorial-modal", {
@@ -390,11 +401,8 @@ async function onClickAddItem(e) {
    closeAllLists();
    MicroModal.close("main-modal");
 
-   let clickedArtistId = e.target.parentNode
-      .getElementsByTagName("input")[0]
-      .getAttribute("data-artistid");
-   let clickedArtistName = e.target.parentNode.getElementsByTagName("input")[0]
-      .value;
+   let clickedArtistId = e.target.children[0].getAttribute("data-artistid");
+   let clickedArtistName = e.target.children[0].getAttribute("data-artistname");
 
    // Search artist on spotify for image
    let spotifySearch = await quickSearchSpotify(clickedArtistName);
@@ -414,8 +422,8 @@ async function onClickAddItem(e) {
    ghostNodeHolder = document.createElement("img");
    ghostNodeHolder.setAttribute("id", "ghostNode");
    ghostNodeHolder.setAttribute("class", "ghost-node rounded-circle");
-   ghostNodeHolder.setAttribute("width", 320 * network.getScale());
-   ghostNodeHolder.setAttribute("height", 320 * network.getScale());
+   ghostNodeHolder.setAttribute("width", 320 * Network.getScale());
+   ghostNodeHolder.setAttribute("height", 320 * Network.getScale());
    ghostNodeHolder.src = gnImg;
    ghostNodeHolder.setAttribute("data-artistId", clickedArtistId);
    document.body.appendChild(ghostNodeHolder);
@@ -433,8 +441,8 @@ async function onClickAddItem(e) {
 function onGhostNodeMousemove(e) {
    //e.stopPropagation();
 
-   let nodeX = mouseX - parentNodeSize * network.getScale();
-   let nodeY = mouseY - parentNodeSize * network.getScale() + bounds.top;
+   let nodeX = MouseX - parentNodeSize * Network.getScale();
+   let nodeY = MouseY - parentNodeSize * Network.getScale() + bounds.top;
 
    ghostNodeHolder.style.left = nodeX + "px";
    ghostNodeHolder.style.top = nodeY + "px";
@@ -443,7 +451,7 @@ function onGhostNodeMousemove(e) {
 async function onGhostNodeClick(e) {
    e.stopPropagation();
    let clickedArtistId = ghostNodeHolder.getAttribute("data-artistId");
-   let canvasCoords = network.DOMtoCanvas({ x: mouseX, y: mouseY });
+   let canvasCoords = Network.DOMtoCanvas({ x: MouseX, y: MouseY });
    ghostNodeHolder.parentNode.removeChild(ghostNodeHolder);
 
    showLoader();
