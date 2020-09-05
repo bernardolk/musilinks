@@ -42,16 +42,16 @@ async function main() {
 
    var jsonParser = bodyparser.json();
 
-   app.use((err, _req , res, _next) => {
+   app.use((err, _req, res, _next) => {
       console.error(err.stack);
       res.status(500).send("Error caught! Debug this bernardo...");
    });
 
-   app.get("/", (_req , res) => {
+   app.get("/", (_req, res) => {
       res.render("index");
    });
 
-   app.get("/token", async (_req , res) => {
+   app.get("/token", async (_req, res) => {
       res.json({ token: spotifyToken, expiration: spotifyExpiration })
    });
 
@@ -103,16 +103,29 @@ async function refreshToken() {
       .then((auth) => {
          spotifyToken = auth.token;
          log(`Token acquired, spotifyToken = ${spotifyToken} and expiration = ${auth.
-expiration}.` );
+            expiration}.`);
          countdown(auth.expiration)
             .then(() => refreshToken());
       })
-      .catch(error => console.log(error));
+      .catch(exception => {
+         if (exception.error === "RESPONSE_NOT_EXPECTED") {
+            log(`\n RESPONSE_NOT_EXPECTED error. Here is response body: \n`);
+         }
+         else if (exception.error === "RESPONSE_ERROR") {
+            log("\n RESPONSE_ERROR error. Here is error object: \n");
+         }
+         else{
+            log("\n ERROR_UNKNOWN error. Here is details: \n");
+         }
+         for (const prop in exception.details) {
+            log(`${prop} : ${exception.details[prop]} \n`);
+         }
+      });
 }
 
 
 
-function log(message){
+function log(message) {
    globalDate = new Date();
    console.log("\n" + message + " :: " + globalDate.toJSON());
 }
