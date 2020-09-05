@@ -371,46 +371,81 @@ const onRelArtistsBtnClick = async function (event) {
    let musicBrainzArtists = Object.keys(searchResults.artists)
       .map((key) => searchResults.artists[key]);
 
-   let relations = [];
+   let names = RelatedArtistList.map(x => x.name);
+   musicBrainzArtists = musicBrainzArtists.filter(x => names.includes(x.name));
 
-   RelatedArtistList.forEach((relatedArtist) => {
-      let relation = {
-         spotify: {
-            id: relatedArtist.spotifyId,
-            image: relatedArtist.img,
-         },
-         name: relatedArtist.name,
-         id: null
-      };
+   // Deals with duplicate names (by chosing the entry with highest score)
+   // BEGIN
 
-      let id, personId = null;
-      musicBrainzArtists.forEach((musicBrainzArtist) => {
-         if (musicBrainzArtist.name.toUpperCase() === relatedArtist.name.toUpperCase()) {
-            if (musicBrainzArtist.type === "Group") {
-               id = musicBrainzArtist.id;
-            }
-            else if (musicBrainzArtist.type === "Person") {
-               personId = musicBrainzArtists.id;
-            }
-         }
-      });
-
-      // If no group match is found, check scanned names list for a 'person' type match
-      if(!id && personId){
-         id = personId;
+   let mb_names = [];
+   let mb_duplicates = [];
+   musicBrainzArtists.forEach(item => { 
+      if (!mb_names.includes(item.name)){ 
+         mb_names.push(item.name); 
       }
-      if (id) {
-         relation.id = id;
-         relations.push(relation);
+      else if(!mb_duplicates.includes(item.name)){
+         mb_duplicates.push(item.name);
       }
    });
 
+   let chosen_artists = mb_duplicates.map(duplicateName => {
+      let duplicates = musicBrainzArtists.filter(x => x.name === duplicateName);
+      let max_score = 0;
+      let chosen_artist = null;
+      duplicates.forEach(artist => {
+         if(artist.score > max_score){
+            max_score = artist.score;
+            chosen_artist = artist;
+         }
+      });
+      return chosen_artist;
+   });
 
-   let options = { edges: { color: relatedArtistEdgeColor } };
-   SelectedNode.setOptions({ relArtistsCreated: true });
-   MicroModal.close("node-modal");
+   let non_duplicate_mb_artists = musicBrainzArtists.filter(x => !mb_duplicates.includes(x.name));
+   chosen_artists.forEach(artist => non_duplicate_mb_artists.push(artist));
 
-   renderCluster(SelectedNode.options.id, relations, options);
+   // END
+
+   let relations = [];
+
+RelatedArtistList.forEach((relatedArtist) => {
+   let relation = {
+      spotify: {
+         id: relatedArtist.spotifyId,
+         image: relatedArtist.img,
+      },
+      name: relatedArtist.name,
+      id: null
+   };
+
+   let id, personId = null;
+   non_duplicate_mb_artists.forEach((artistItem) => {
+      if (artistItem.name.toUpperCase() === relatedArtist.name.toUpperCase()) {
+         if (artistItem.type === "Group") {
+            id = artistItem.id;
+         }
+         else if (artistItem.type === "Person") {
+            personId = artistItem.id;
+         }
+      }
+   });
+
+   // If no group match is found, check scanned names list for a 'person' type match
+   if (!id && personId) {
+      id = personId;
+   }
+   if (id) {
+      relation.id = id;
+      relations.push(relation);
+   }
+});
+
+
+let options = { edges: { color: relatedArtistEdgeColor } };
+SelectedNode.setOptions({ relArtistsCreated: true });
+MicroModal.close("node-modal");
+
+renderCluster(SelectedNode.options.id, relations, options);
 };
 
 
@@ -447,7 +482,7 @@ function renderCluster(targetNodeId, relatedArtists, options, wasDragged) {
    let targetNode = Network.body.nodes[targetNodeId];
 
    // Only has it's parent node as a related artist
-   if (wasDragged && numberOfArtists <= 1) {
+   if (wasDragged && numberOfArtists == 0) {
       targetNode.setOptions({ color: { border: noRelatedArtistsColor } });
       return;
    }
