@@ -3,7 +3,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 // @bernardolk - Bernardo Knackfuss 2019 - 2020
 ////////////////////////////////////////////////////////////////////////////////////////
-
 // Control variables
 var ghostNodeClick = false;
 var ghostNodeHolder = null;
@@ -172,7 +171,7 @@ const hideBtns = () => {
 
 const onMainModalShow = () => {
    mainModalOpen = true;
-
+   closeAllLists();
    hideBtns();
 
    if (Network) {
@@ -232,8 +231,6 @@ document.addEventListener("DOMContentLoaded", () => {
 ///////////////////////////////////////////////////////////////
 //                         AUTOCOMPLETE
 ///////////////////////////////////////////////////////////////
-
-//Apply event listeners
 const searchBar = document.getElementById("search-bar");
 var searchInput;
 autocomplete(searchBar);
@@ -245,7 +242,6 @@ let debouncedSearch = _.debounce(async () => {
       let acContainerElmnt = document.createElement("DIV");
       acContainerElmnt.setAttribute("id", searchBar.id + "autocomplete-list");
       acContainerElmnt.setAttribute("class", "autocomplete-items");
-      document.getElementById("main-form").appendChild(acContainerElmnt);
 
       // construct list of artist search results
       for (let i = 0; i < Object.keys(artistList).length; i++) {
@@ -275,9 +271,9 @@ let debouncedSearch = _.debounce(async () => {
          else {
             console.log('searchMode is in an invalid state. Check where this variable is set.');
          }
-
          acContainerElmnt.appendChild(itemDivElement);
       }
+      document.getElementById("main-form").appendChild(acContainerElmnt);
    }
 }, debounceInterval);
 
@@ -423,7 +419,6 @@ async function onClickAddItem(e) {
    });
 
    closeLoader();
-
    displayBtns();
 }
 

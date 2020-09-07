@@ -473,7 +473,10 @@ function renderCluster(targetNodeId, relatedArtists, options, wasDragged) {
 
          return {
             ...edgeLabel,
-            title: attributes
+            title: attributes,
+            chosen: {
+               label: onHoverLabel
+            }
          }
       }
 
