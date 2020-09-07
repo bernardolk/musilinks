@@ -436,7 +436,7 @@ function renderCluster(targetNodeId, relatedArtists, options, wasDragged) {
    let targetNode = Network.body.nodes[targetNodeId];
 
    // Only has it's parent node as a related artist
-   if (wasDragged && numberOfArtists == 0) {
+   if (wasDragged && numberOfArtists == 1) {
       targetNode.setOptions({ color: { border: noRelatedArtistsColor } });
       return;
    }
