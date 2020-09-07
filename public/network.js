@@ -431,16 +431,10 @@ var onCloseNodeModal = () => {
 //                               RENDER CLUSTER
 ////////////////////////////////////////////////////////////////////////////////////////
 // Create related artists nodes (cluster)
-function renderCluster(targetNodeId, relatedArtists, options, wasDragged) {
+function renderCluster(targetNodeId, relatedArtists, options, _wasDragged) {
    let numberOfArtists = Object.keys(relatedArtists).length;
    let targetNode = Network.body.nodes[targetNodeId];
-
-   // Only has it's parent node as a related artist
-   if (wasDragged && numberOfArtists == 1) {
-      targetNode.setOptions({ color: { border: noRelatedArtistsColor } });
-      return;
-   }
-
+   let createdNodeOrLink = false;
    const onHoverLabel = (values, _id, _selected, _hovering) => {
       values.size = 50;
    };
@@ -515,6 +509,7 @@ function renderCluster(targetNodeId, relatedArtists, options, wasDragged) {
          });
 
          NodeIds.push(lastNodeId + 1);
+         createdNodeOrLink = true;
       }
 
       // if node already exists in network, we will only create a new link
@@ -532,7 +527,6 @@ function renderCluster(targetNodeId, relatedArtists, options, wasDragged) {
          }
          // If it's not already created, creates it
          if (!linkAlreadyCreated) {
-
             const edgeProps = getEdgeProps();
 
             EdgeList.add({
@@ -541,8 +535,13 @@ function renderCluster(targetNodeId, relatedArtists, options, wasDragged) {
                color: { color: options.edges.color },
                ...edgeProps
             });
+            createdNodeOrLink = true;
          }
       }
+   }
+   if(createdNodeOrLink === false){
+      targetNode.setOptions({ color: { border: noRelatedArtistsColor } });
+      return;
    }
 }
 
