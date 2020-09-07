@@ -8,12 +8,25 @@ var getArtistInfo = async function (artistId) {
    // Fetch data from Musicbrainz
    let musicBrainzArtistData = await getMbArtist(artistId);
 
+
+   const type = musicBrainzArtistData.type;
+   const inceptionType = type === "Person" ? "born" : "founded";
+   const genres = musicBrainzArtistData.genres ? musicBrainzArtistData.genres.length > 0 ? 
+      musicBrainzArtistData.genres.map(genre => genre.name).join(", ") 
+      : 'unknown genres': 'unknown genres';
+   const area = musicBrainzArtistData.area ? musicBrainzArtistData.area.name ? 
+      musicBrainzArtistData.area.name : 'unknown place' : 'unknown place'; 
+   const foundedIn = musicBrainzArtistData['life-span'].begin ?
+      musicBrainzArtistData['life-span'].begin : 'an unknown date';
+   const bio =  `A ${type} from ${area} ${inceptionType} in ${foundedIn} playing ${genres}.`;  
+
    let response = {
       artist: {
          name: musicBrainzArtistData.name,
          id: musicBrainzArtistData.id,
          type: musicBrainzArtistData.type,
          description: musicBrainzArtistData.disambiguation,
+         bio: bio,
          spotifyId: null,
          image: NOT_FOUND_PIC
       },
@@ -23,7 +36,6 @@ var getArtistInfo = async function (artistId) {
    if (!musicBrainzArtistData.error) {
       // types of musicbrainz relationships we want to consider
       let relTypes = ["member of band"];
-
       // if little nodes... put some collaborators too in the mix
       if (musicBrainzArtistData.relations.filter(x => x.type === "member of band").length < 2) {
          relTypes.push("collaboration");
@@ -41,6 +53,11 @@ var getArtistInfo = async function (artistId) {
             response.relations.push(
                {
                   ...relation.artist,
+                  attributes : relation.attributes,
+                  formation : {
+                     from: relation.begin ? splitPop('-', relation.begin) : '?',
+                     to: relation.ended ? relation.end ? splitPop('-', relation.end) : '?' : 'now'
+                  },
                   spotify: {
                      image: NOT_FOUND_PIC,
                      id: ""
@@ -102,7 +119,7 @@ var getArtistInfo = async function (artistId) {
 
 function getMbArtist(artistId) {
    let BASE_URL = "https://musicbrainz.org/ws/2/";
-   let FETCH_URL = BASE_URL + "artist/" + artistId + "?inc=artist-rels&fmt=json";
+   let FETCH_URL = BASE_URL + "artist/" + artistId + "?inc=artist-rels+genres&fmt=json";
 
    let mbFetchParams = {
       method: "GET",
@@ -221,9 +238,9 @@ function searchMusicBrainz(query, limit) {
 }
 
 
-//-----------------------------
-// SPOTIFY API Fetch Functions
-//-----------------------------
+/////////////////////////////////////////////////////////////
+//             SPOTIFY API Fetch Functions
+/////////////////////////////////////////////////////////////
 async function getRelatedArtists(artistId) {
    let BASE_URL = "https://api.spotify.com/v1/artists/";
    let FETCH_URL = BASE_URL + artistId + "/related-artists";
@@ -241,4 +258,14 @@ async function getSpotifyArtistInfo(artistId) {
    return res.json();
 }
 
+
+
+/////////////////////////////////////////////////////////////
+//                        UTILS
+/////////////////////////////////////////////////////////////
+
+function splitPop(char, string){
+   let splited = string.split(char);
+   return splited[0];
+}
 

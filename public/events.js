@@ -21,10 +21,11 @@ const MIN_WINDOW_WIDTH_FOR_FIVE_ARTISTS = 700;
 const REL_ARTISTS_ROWS = window.innerWidth < MIN_WINDOW_WIDTH_FOR_FIVE_ARTISTS ? 5 : 4;
 const REL_ARTISTS_PER_ROW = window.innerWidth < MIN_WINDOW_WIDTH_FOR_FIVE_ARTISTS ? 4 : 5;
 const NOT_FOUND_PIC = "notfound.png";
+const MAX_WINDOW_WIDTH_FOR_SEARCHBAR_TEXT = 700;
 
-// ---------------------------------------------
-//             authenticate client
-// ---------------------------------------------
+///////////////////////////////////////////////////
+//             GET SPOTIFY API TOKEN
+///////////////////////////////////////////////////
 var spotifyToken = null;
 var tokenExpiration = null;
 
@@ -72,11 +73,7 @@ function countdown(expiration) {
 //                     MAIN EXECUTION
 //////////////////////////////////////////////////////////////
 (async function main() {
-   // let localTutorialState = window.localStorage.getItem("musilinks_tutorial");
-   // if(localTutorialState === "DONE")
-   //    showTutorial = false;
-
-   if (window.innerWidth < 700) {
+   if (window.innerWidth < MAX_WINDOW_WIDTH_FOR_SEARCHBAR_TEXT) {
       document.getElementById('search-bar').placeholder = "";
    }
 
@@ -105,8 +102,6 @@ function countdown(expiration) {
       }
    }
 
-
-
    MicroModal.show("loading-modal");
    await getSpotifyToken();
    MicroModal.close("loading-modal");
@@ -117,9 +112,9 @@ function countdown(expiration) {
    });
 })();
 
-// ---------------------------------------------
-//             modal controls
-// ---------------------------------------------
+////////////////////////////////////////////////
+//                MODAL CONTROLS
+////////////////////////////////////////////////
 function showLoader() {
    MicroModal.show("loading-modal");
 }
@@ -142,6 +137,7 @@ function closeLoader() {
 
 const onMainModalClose = () => {
    mainModalOpen = false;
+   closeAllLists();
    searchBar.value = "";
    if (!showTutorial) {
       displayBtns();
@@ -202,27 +198,15 @@ function onHelpModalClose() {
 const helpIcon = document.getElementById("help-icon");
 helpIcon.addEventListener("click", e => onClickHelp(e));
 
-// ---------------------------------------------
-//               document events
-// ---------------------------------------------
-
-// document.onkeypress = function (e) {
-//    e = e || window.event;
-//    let charCode = typeof e.which == "number" ? e.which : e.keyCode;
-//    if (charCode && !mainModalOpen) {
-//       MicroModal.show("main-modal", {
-//          onClose: onMainModalClose,
-//          onShow: onMainModalShow
-//       });
-//    }
-// };
-
+/////////////////////////////////////////////////////////
+//                   DOCUMENT EVENTS
+/////////////////////////////////////////////////////////
 document.onmousemove = function (e) {
    MouseX = e.clientX - bounds.left;
    MouseY = e.clientY - bounds.top;
 };
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
    document.getElementById("open-search-btn").addEventListener("click", () => {
       searchMode = 'CREATE';
       MicroModal.show("main-modal", {
@@ -245,16 +229,16 @@ document.addEventListener("DOMContentLoaded", function () {
    });
 });
 
-// ---------------------------------------------
-//                autocomplete
-// ---------------------------------------------
+///////////////////////////////////////////////////////////////
+//                         AUTOCOMPLETE
+///////////////////////////////////////////////////////////////
 
 //Apply event listeners
 const searchBar = document.getElementById("search-bar");
 var searchInput;
 autocomplete(searchBar);
 
-let debouncedSearch = _.debounce(async function () {
+let debouncedSearch = _.debounce(async () => {
    if (searchInput != "") {
       let artistList = await searchMusicBrainzLimited(searchInput);
 
@@ -268,7 +252,8 @@ let debouncedSearch = _.debounce(async function () {
          let itemDivElement = document.createElement("DIV");
 
          if (artistList[i].description) {
-            itemDivElement.innerHTML = `${artistList[i].name} - <i>${artistList[i].description}</i>`;
+            itemDivElement.innerHTML =
+               `${artistList[i].name} - <i>${artistList[i].description}</i>`;
          }
          else {
             itemDivElement.innerHTML = artistList[i].name;
@@ -279,11 +264,6 @@ let debouncedSearch = _.debounce(async function () {
          itemInputElement.setAttribute("data-artistname", artistList[i].name);
          itemInputElement.setAttribute("type", "hidden");
          itemDivElement.appendChild(itemInputElement);
-
-         // acItemElmnt.innerHTML +=
-         //    `<input type='hidden' value='${artistList[i].name}' 
-         //    data-artistid='${artistList[i].id}'
-         //    data-artistname='${artistList[i].name}'>`;
 
          // On search item click
          if (searchMode === 'CREATE') {
@@ -304,42 +284,28 @@ let debouncedSearch = _.debounce(async function () {
 function autocomplete(searchBar) {
    let currentFocus;
 
-   // listen for user input in the search bar
    searchBar.addEventListener("input", function (e) {
       searchInput = e.target.value;
       currentFocus = -1;
-
       closeAllLists();
-      let args = [{ searchInput: searchInput }];
       debouncedSearch.bind(searchBar);
       debouncedSearch();
    });
 
-   /*execute a function presses a key on the keyboard:*/
    searchBar.addEventListener("keydown", function (e) {
-      // gets the list
       let x = document.getElementById(this.id + "autocomplete-list");
-      // if we do have a list...
       if (x) {
          x = x.getElementsByTagName("div");
       }
       if (e.keyCode == 40) {
-         /*If the arrow DOWN key is pressed, increase the currentFocus variable:*/
          currentFocus++;
-         /*and and make the current item more visible:*/
          addActive(x);
       } else if (e.keyCode == 38) {
-         //up
-         /*If the arrow UP key is pressed,
-             decrease the currentFocus variable:*/
          currentFocus--;
-         /*and and make the current item more visible:*/
          addActive(x);
       } else if (e.keyCode == 13) {
-         /*If the ENTER key is pressed, prevent the form from being submitted,*/
          e.preventDefault();
          if (currentFocus > -1) {
-            /*and simulate a click on the "active" item:*/
             if (x) x[currentFocus].click();
          }
       }
@@ -358,9 +324,6 @@ function autocomplete(searchBar) {
       }
    }
 
-   document.addEventListener("click", function (e) {
-      closeAllLists(e.target);
-   });
 }
 
 
@@ -371,23 +334,13 @@ function autocomplete(searchBar) {
 async function onClickItem(e) {
    e.stopPropagation();
 
-   // Get artistId from clicked autocomplete item
-   // Checks if clicked on input tag or div tag
-   let artistId;
-   if (e.target.tagName.toLowerCase() == "i") {
-      artistId = e.target.parentNode
-         .getElementsByTagName("input")[0]
-         .getAttribute("data-artistid");
-   } else {
-      artistId = e.target
-         .getElementsByTagName("input")[0]
-         .getAttribute("data-artistid");
-   }
+   let artistId = e.target
+      .getElementsByTagName("input")[0]
+      .getAttribute("data-artistid");
 
 
    MicroModal.close("main-modal");
 
-   closeAllLists();
    showLoader();
    let resJSON = await getArtistInfo(artistId);
    closeLoader();
@@ -431,11 +384,12 @@ function closeAllLists() {
 async function onClickAddItem(e) {
    e.stopPropagation();
 
-   closeAllLists();
-   MicroModal.close("main-modal");
+   let inputElement = e.target.getElementsByTagName("input")[0];
+   let clickedArtistId = inputElement.getAttribute("data-artistid");
+   let clickedArtistName = inputElement.getAttribute("data-artistname");
 
-   let clickedArtistId = e.target.children[0].getAttribute("data-artistid");
-   let clickedArtistName = e.target.children[0].getAttribute("data-artistname");
+   MicroModal.close("main-modal");
+   showLoader();
 
    // Search artist on spotify for image
    let spotifySearch = await quickSearchSpotify(clickedArtistName);
@@ -467,6 +421,8 @@ async function onClickAddItem(e) {
    ghostNodeHolder.addEventListener("click", e => {
       onGhostNodeClick(e);
    });
+
+   closeLoader();
 
    displayBtns();
 }

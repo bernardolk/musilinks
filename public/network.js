@@ -15,6 +15,7 @@ var HighlightedNode = null;
 var RelatedArtistList = [];
 
 const doubleClickInterval = 300;
+const INITIAL_ZOOM_LEVEL = 0.32;
 
 ////////////////////////////////////////////////////////////////////////////////////////
 //                                NODE AND EDGES STYLING
@@ -112,7 +113,7 @@ function startNetwork(artistsData) {
 
    Network.once("startStabilizing", function () {
       Network.moveTo({
-         scale: 0.5,
+         scale: INITIAL_ZOOM_LEVEL,
          animation: {
             duration: 1000,
             easingFunction: "easeOutQuad"
@@ -139,13 +140,14 @@ function startNetwork(artistsData) {
                let artistId = releasedNode.options.artistId;
 
                // Augment original node edge length upon release
-               Network.body.edges[params.edges[0]].setOptions({
-                  length: largerEdgeLegth
-               });
+               const edge = Network.body.edges[params.edges[0]];
+               edge.options.length = largerEdgeLegth;
+
                // Change properties of node upon release as well
                releasedNode.setOptions(releasedNodeOptions);
-
                let artistData = await getArtistInfo(artistId);
+               releasedNode.options.title = artistData.artist.bio;
+
                let options = { edges: { color: defaultColor } };
                renderCluster(releasedNodeId, artistData.relations, options, true);
             }
@@ -275,7 +277,7 @@ async function openNodeModal(params) {
             name: artist.name,
             spotifyId: artist.id,
             genres: artist.genres,
-            image: artist.images.length > 0 ? 
+            image: artist.images.length > 0 ?
                artist.images[artist.images.length - 1].url : NOT_FOUND_PIC
          });
       });
@@ -283,7 +285,7 @@ async function openNodeModal(params) {
 
       let rowCount = 0;
       Object.keys(relArtists).forEach((_, i) => {
-         if(i % REL_ARTISTS_PER_ROW === 0 && i > 0){
+         if (i % REL_ARTISTS_PER_ROW === 0 && i > 0) {
             rowCount++;
          }
          let j = i % REL_ARTISTS_PER_ROW;
@@ -431,7 +433,6 @@ var onCloseNodeModal = () => {
 // Create related artists nodes (cluster)
 function renderCluster(targetNodeId, relatedArtists, options, wasDragged) {
    let numberOfArtists = Object.keys(relatedArtists).length;
-
    let targetNode = Network.body.nodes[targetNodeId];
 
    // Only has it's parent node as a related artist
@@ -440,7 +441,42 @@ function renderCluster(targetNodeId, relatedArtists, options, wasDragged) {
       return;
    }
 
+   const onHoverLabel = (values, _id, _selected, _hovering) => {
+      values.size = 50;
+   };
+
    for (let i = 0; i < numberOfArtists; i++) {
+
+      const getEdgeProps = () => {
+         let edgeLabel = {};
+         let attributes = "Related artist";
+
+         if (relatedArtists[i].formation) {
+            const from = relatedArtists[i].formation.from;
+            const to = relatedArtists[i].formation.to;
+            edgeLabel = {
+               label: `${from} - ${to}`,
+               font: {
+                  align: 'top',
+                  size: 28,
+                  strokeWidth: 0,
+                  color: '#ffffff'
+               }
+            };
+            if (relatedArtists[i].attributes.length > 0) {
+               attributes = relatedArtists[i].attributes.join(', ');
+            }
+            else {
+               attributes = "No additional info";
+            }
+         }
+
+         return {
+            ...edgeLabel,
+            title: attributes
+         }
+      }
+
       let lastNodeId = NodeIds[NodeIds.length - 1];
       let duplicatedNode = null;
 
@@ -463,14 +499,18 @@ function renderCluster(targetNodeId, relatedArtists, options, wasDragged) {
             label: relatedArtists[i].name,
             image: relatedArtists[i].spotify.image,
             x: targetNode.x,
-            y: targetNode.y
+            y: targetNode.y,
          });
+
+         let edgeProps = getEdgeProps();
 
          EdgeList.add({
             from: targetNodeId,
             to: lastNodeId + 1,
-            color: { color: options.edges.color }
+            color: { color: options.edges.color },
+            ...edgeProps
          });
+
          NodeIds.push(lastNodeId + 1);
       }
 
@@ -489,10 +529,14 @@ function renderCluster(targetNodeId, relatedArtists, options, wasDragged) {
          }
          // If it's not already created, creates it
          if (!linkAlreadyCreated) {
+
+            const edgeProps = getEdgeProps();
+
             EdgeList.add({
                from: targetNodeId,
                to: duplicatedNode.options.id,
-               color: { color: options.edges.color }
+               color: { color: options.edges.color },
+               ...edgeProps
             });
          }
       }
@@ -518,6 +562,7 @@ function clearNetwork() {
 //                                  CREATE NODE
 ////////////////////////////////////////////////////////////////////////////////////////
 function createNode(artistsData, Xo, Yo) {
+   const artist = artistsData.artist;
    let lastNodeId;
    if (NodeIds.length > 0) {
       lastNodeId = NodeIds[NodeIds.length - 1];
@@ -529,7 +574,7 @@ function createNode(artistsData, Xo, Yo) {
    let mainArtistNode = null;
 
    for (let j = 0; j <= lastNodeId; j++) {
-      if (Network.body.nodes[j].options.artistId == artistsData.artist.id) {
+      if (Network.body.nodes[j].options.artistId == artist.id) {
          mainArtistNode = Network.body.nodes[j];
          break;
       }
@@ -542,10 +587,10 @@ function createNode(artistsData, Xo, Yo) {
       NodeList.add({
          id: newNodeId,
          shape: "circularImage",
-         image: artistsData.artist.image,
-         label: artistsData.artist.name,
-         artistId: artistsData.artist.id,
-         spotifyId: artistsData.artist.spotifyId,
+         image: artist.image,
+         label: artist.name,
+         artistId: artist.id,
+         spotifyId: artist.spotifyId,
          membersCreated: true,
          relArtistsCreated: false,
          size: parentNodeSize,
@@ -556,7 +601,8 @@ function createNode(artistsData, Xo, Yo) {
          originalColor: parentNodeColor,
          x: Xo,
          y: Yo,
-         borderWidth: largerBorderWidth
+         borderWidth: largerBorderWidth,
+         title: artist.bio
       });
 
       NodeIds.push(newNodeId);
