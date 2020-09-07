@@ -17,6 +17,11 @@ var showTutorial = true;
 var searchMode = 'CREATE';
 var noRelatedArtists = false;
 
+const MIN_WINDOW_WIDTH_FOR_FIVE_ARTISTS = 700;
+const REL_ARTISTS_ROWS = window.innerWidth < MIN_WINDOW_WIDTH_FOR_FIVE_ARTISTS ? 5 : 4;
+const REL_ARTISTS_PER_ROW = window.innerWidth < MIN_WINDOW_WIDTH_FOR_FIVE_ARTISTS ? 4 : 5;
+const NOT_FOUND_PIC = "notfound.png";
+
 // ---------------------------------------------
 //             authenticate client
 // ---------------------------------------------
@@ -75,6 +80,33 @@ function countdown(expiration) {
       document.getElementById('search-bar').placeholder = "";
    }
 
+   let spotifyRelArtistElement = document.getElementById("node-modal-related");
+   let zIndex = 900;
+
+   for (let i = 0; i < REL_ARTISTS_ROWS; i++) {
+      let newRow = document.createElement("div");
+      newRow.setAttribute("id", "related-artist-row-" + i);
+      newRow.setAttribute("class", "related-artist-row");
+      newRow.style.zIndex = zIndex;
+      zIndex -= 1;
+      spotifyRelArtistElement.appendChild(newRow);
+
+      for (let j = 0; j < REL_ARTISTS_PER_ROW; j++) {
+         let imgContainer = document.createElement("div");
+         imgContainer.setAttribute("id", `rel-artist-img-container-${i}-${j}`);
+         imgContainer.setAttribute("class", "related-artist-image-div");
+
+         let relArtImg = document.createElement("img");
+         relArtImg.setAttribute("id", `rel-artist-img-${i}-${j}`);
+         relArtImg.setAttribute("class", "rounded-circle related-artist-image");
+
+         imgContainer.appendChild(relArtImg);
+         newRow.appendChild(imgContainer);
+      }
+   }
+
+
+
    MicroModal.show("loading-modal");
    await getSpotifyToken();
    MicroModal.close("loading-modal");
@@ -93,7 +125,7 @@ function showLoader() {
 }
 
 
-function displayTooltip(){
+function displayTooltip() {
    const infoTooltip = document.getElementById("info-container");
    infoTooltip.classList.remove("hidden");
    infoTooltip.classList.add("visible");
@@ -158,11 +190,12 @@ const onClickHelp = function () {
    MicroModal.close("main-modal");
    MicroModal.show("help-modal", {
       onShow: () => hideBtns(),
-      onClose: () => MicroModal.show("main-modal") });
+      onClose: () => MicroModal.show("main-modal")
+   });
 };
 
 
-function onHelpModalClose(){
+function onHelpModalClose() {
    MicroModal.show("main-modal");
 }
 
@@ -236,7 +269,7 @@ let debouncedSearch = _.debounce(async function () {
 
          if (artistList[i].description) {
             itemDivElement.innerHTML = `${artistList[i].name} - <i>${artistList[i].description}</i>`;
-         } 
+         }
          else {
             itemDivElement.innerHTML = artistList[i].name;
          }
@@ -364,7 +397,7 @@ async function onClickItem(e) {
    if (showTutorial) {
       MicroModal.show("tutorial-modal", {
          onClose: () => {
-            if(noRelatedArtists)
+            if (noRelatedArtists)
                displayTooltip();
             displayBtns();
          }
@@ -406,7 +439,7 @@ async function onClickAddItem(e) {
 
    // Search artist on spotify for image
    let spotifySearch = await quickSearchSpotify(clickedArtistName);
-   let gnImg = "notfound.jpg";
+   let gnImg = NOT_FOUND_PIC;
    if (spotifySearch.artists.items.length > 0) {
       let artistSpotifyId = spotifySearch.artists.items[0].id;
       let artistInfo = await getSpotifyArtistInfo(artistSpotifyId);

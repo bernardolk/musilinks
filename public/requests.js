@@ -15,7 +15,7 @@ var getArtistInfo = async function (artistId) {
          type: musicBrainzArtistData.type,
          description: musicBrainzArtistData.disambiguation,
          spotifyId: null,
-         image: "notfound.jpg"
+         image: NOT_FOUND_PIC
       },
       relations: []
    };
@@ -42,7 +42,7 @@ var getArtistInfo = async function (artistId) {
                {
                   ...relation.artist,
                   spotify: {
-                     image: "notfound.jpg",
+                     image: NOT_FOUND_PIC,
                      id: ""
                   }
                });
