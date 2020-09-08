@@ -473,6 +473,16 @@ Tooltips for main screen buttons
 }
 
 
+.instructions{
+   color: white;
+   font-family: monospace;
+   font-size: 18px;
+}
+
+.instructions_highlight{
+   color: #3bb94c;
+}
+
 
 
 .placeholder-icon::after{
@@ -563,8 +573,8 @@ input {
   margin-bottom: 2rem;
   line-height: 1.5;
   color: rgba(255, 255, 255, 0.8);
-  text-align: center;
-  font-size: 1.2rem;
+  text-align: left;
+  font-size: 14px;
   width: 100%;
   height: 45%;
 }

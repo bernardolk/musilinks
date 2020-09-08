@@ -425,8 +425,8 @@ async function onClickAddItem(e) {
 function onGhostNodeMousemove(e) {
    //e.stopPropagation();
 
-   let nodeX = MouseX - parentNodeSize * Network.getScale();
-   let nodeY = MouseY - parentNodeSize * Network.getScale() + bounds.top;
+   let nodeX = MouseX - PARENT_NODE_SIZE * Network.getScale();
+   let nodeY = MouseY - PARENT_NODE_SIZE * Network.getScale() + bounds.top;
 
    ghostNodeHolder.style.left = nodeX + "px";
    ghostNodeHolder.style.top = nodeY + "px";

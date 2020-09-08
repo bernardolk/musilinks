@@ -14,46 +14,47 @@ var MouseY;
 var HighlightedNode = null;
 var RelatedArtistList = [];
 
-const doubleClickInterval = 300;
+const DOUBLE_CLICK_INTERVAL = 300;
 const INITIAL_ZOOM_LEVEL = 0.32;
 
 ////////////////////////////////////////////////////////////////////////////////////////
-//                                NODE AND EDGES STYLING
+//                         NODE AND EDGES STYLING AND PROPERTIES
 ////////////////////////////////////////////////////////////////////////////////////////
-const defaultColor = "steelBlue";
-const highlightColor = "yellow";
-const parentNodeColor = "steelBlue";
-const loadingColor = "purple";
-const relatedArtistEdgeColor = "seaGreen";
-const defaultEdgeLength = 500;
-const largerEdgeLegth = 1400;
-const nodeSize = 80;
-const parentNodeSize = 160;
-const defaultFontSize = 40;
-const parentFontSize = 55;
-const defaultFontColor = "#eeeeee";
-const minRepulsion = 500;
-const maxRepulsion = 1000;
-const defaultBorderWidth = 2;
-const largerBorderWidth = 6;
-const fixedNodeOptions = {
+const BACKGROUND_COLOR = "steelBlue";
+const HIGHLIGHT_COLOR = "yellow";
+const PARENT_NODE_COLOR = "steelBlue";
+const LOADING_COLOR = "purple";
+const RELATED_ARTIST_EDGE_COLOR = "seaGreen";
+const EDGE_LABEL_COLOR = '#8DAFCC';
+const DEFAULT_FONT_COLOR = "#eeeeee";
+const NO_RELATED_ARTIST_COLOR = "pink";
+
+const DEFAULT_EDGE_LENGTH = 500;
+const LARGER_EDGE_LENGTH = 1400;
+const NODE_SIZE = 80;
+const PARENT_NODE_SIZE = 160;
+const DEFAULT_FONT_SIZE = 40;
+const PARENT_FONT_SIZE = 55;
+const MIN_REPULSION = 500;
+const MAX_REPULSION = 1000;
+const DEFAULT_BORDER_WIDTH = 2;
+const LARGER_BORDER_WIDTH = 6;
+const EDGES_WIDTH = 3.5;
+
+const FIXED_NODE_OPTIONS = {
    fixed: { x: true, y: true },
-   borderWidth: largerBorderWidth,
+   borderWidth: LARGER_BORDER_WIDTH,
    color: { border: "darkGrey" }
 };
-const unfixedNodeOptions = {
+const UNFIXED_NODE_OPTIONS = {
    fixed: { x: false, y: false },
 };
-const noRelatedArtistsColor = "pink";
-const edgesWidth = 3.5;
-
-// effects applied to the node after it is released
-const releasedNodeOptions = {
+const RELEASED_NODE_OPTIONS = {
    membersCreated: true,
-   color: { border: parentNodeColor },
-   borderWidth: largerBorderWidth,
-   size: parentNodeSize,
-   font: { size: parentFontSize }
+   color: { border: PARENT_NODE_COLOR },
+   borderWidth: LARGER_BORDER_WIDTH,
+   size: PARENT_NODE_SIZE,
+   font: { size: PARENT_FONT_SIZE }
 };
 
 // Initializes the micromodal instance
@@ -75,29 +76,29 @@ function startNetwork(artistsData) {
 
    let options = {
       nodes: {
-         size: nodeSize,
+         size: NODE_SIZE,
          color: {
-            background: defaultColor,
-            highlight: highlightColor,
-            border: defaultColor
+            background: BACKGROUND_COLOR,
+            highlight: HIGHLIGHT_COLOR,
+            border: BACKGROUND_COLOR
          },
-         font: { color: defaultFontColor, size: defaultFontSize },
+         font: { color: DEFAULT_FONT_COLOR, size: DEFAULT_FONT_SIZE },
          shape: "circularImage",
-         borderWidth: defaultBorderWidth
+         borderWidth: DEFAULT_BORDER_WIDTH
       },
       edges: {
          selectionWidth: 0,
          color: {
-            color: defaultColor,
-            highlight: highlightColor
+            color: BACKGROUND_COLOR,
+            highlight: HIGHLIGHT_COLOR
          },
-         width: edgesWidth
+         width: EDGES_WIDTH
       },
       physics: {
          solver: "repulsion",
          repulsion: {
-            nodeDistance: minRepulsion,
-            springLength: defaultEdgeLength,
+            nodeDistance: MIN_REPULSION,
+            springLength: DEFAULT_EDGE_LENGTH,
             springConstant: 0.03
          }
       }
@@ -141,14 +142,14 @@ function startNetwork(artistsData) {
 
                // Augment original node edge length upon release
                const edge = Network.body.edges[params.edges[0]];
-               edge.options.length = largerEdgeLegth;
+               edge.options.length = LARGER_EDGE_LENGTH;
 
                // Change properties of node upon release as well
-               releasedNode.setOptions(releasedNodeOptions);
+               releasedNode.setOptions(RELEASED_NODE_OPTIONS);
                let artistData = await getArtistInfo(artistId);
                releasedNode.options.title = artistData.artist.bio;
 
-               let options = { edges: { color: defaultColor } };
+               let options = { edges: { color: BACKGROUND_COLOR } };
                renderCluster(releasedNodeId, artistData.relations, options, true);
             }
          }
@@ -158,12 +159,12 @@ function startNetwork(artistsData) {
    Network.on("click", function (params) {
       var clickTime = new Date();
 
-      if (clickTime - doubleClickTime > doubleClickInterval) {
+      if (clickTime - doubleClickTime > DOUBLE_CLICK_INTERVAL) {
          setTimeout(function () {
-            if (clickTime - doubleClickTime > doubleClickInterval) {
+            if (clickTime - doubleClickTime > DOUBLE_CLICK_INTERVAL) {
                onClick(params);
             }
-         }, doubleClickInterval);
+         }, DOUBLE_CLICK_INTERVAL);
       }
    });
 
@@ -190,13 +191,13 @@ function startNetwork(artistsData) {
          if (!HighlightedNode) {
             if (!maxRepulsionMode) {
                Network.setOptions({
-                  physics: { repulsion: { nodeDistance: maxRepulsion } }
+                  physics: { repulsion: { nodeDistance: MAX_REPULSION } }
                });
                maxRepulsionMode = true;
             }
             else {
                Network.setOptions({
-                  physics: { repulsion: { nodeDistance: minRepulsion } }
+                  physics: { repulsion: { nodeDistance: MIN_REPULSION } }
                });
                maxRepulsionMode = false;
             }
@@ -219,12 +220,12 @@ function startNetwork(artistsData) {
                   originalBorderWidth: originalBorderWidth
                });
 
-               HighlightedNode.setOptions(fixedNodeOptions);
+               HighlightedNode.setOptions(FIXED_NODE_OPTIONS);
                Network.startSimulation();
             }
             else {
                HighlightedNode.setOptions({
-                  ...unfixedNodeOptions,
+                  ...UNFIXED_NODE_OPTIONS,
                   color: { border: HighlightedNode.options.originalColor },
                   borderWidth: HighlightedNode.options.originalBorderWidth
                });
@@ -409,7 +410,7 @@ const onRelArtistsBtnClick = async function (event) {
    });
 
 
-   let options = { edges: { color: relatedArtistEdgeColor } };
+   let options = { edges: { color: RELATED_ARTIST_EDGE_COLOR } };
    SelectedNode.setOptions({ relArtistsCreated: true });
    MicroModal.close("node-modal");
 
@@ -437,6 +438,7 @@ function renderCluster(targetNodeId, relatedArtists, options, _wasDragged) {
    let createdNodeOrLink = false;
    const onHoverLabel = (values, _id, _selected, _hovering) => {
       values.size = 50;
+      values.color = "#FFFFFF";
    };
 
    for (let i = 0; i < numberOfArtists; i++) {
@@ -454,7 +456,7 @@ function renderCluster(targetNodeId, relatedArtists, options, _wasDragged) {
                   align: 'top',
                   size: 28,
                   strokeWidth: 0,
-                  color: '#ffffff'
+                  color: EDGE_LABEL_COLOR
                }
             };
             if (relatedArtists[i].attributes.length > 0) {
@@ -540,7 +542,7 @@ function renderCluster(targetNodeId, relatedArtists, options, _wasDragged) {
       }
    }
    if(createdNodeOrLink === false){
-      targetNode.setOptions({ color: { border: noRelatedArtistsColor } });
+      targetNode.setOptions({ color: { border: NO_RELATED_ARTIST_COLOR } });
       return;
    }
 }
@@ -595,20 +597,20 @@ function createNode(artistsData, Xo, Yo) {
          spotifyId: artist.spotifyId,
          membersCreated: true,
          relArtistsCreated: false,
-         size: parentNodeSize,
+         size: PARENT_NODE_SIZE,
          mass: 100,
-         font: { size: parentFontSize },
-         ...fixedNodeOptions,
-         originalBorderWidth: largerBorderWidth,
-         originalColor: parentNodeColor,
+         font: { size: PARENT_FONT_SIZE },
+         ...FIXED_NODE_OPTIONS,
+         originalBorderWidth: LARGER_BORDER_WIDTH,
+         originalColor: PARENT_NODE_COLOR,
          x: Xo,
          y: Yo,
-         borderWidth: largerBorderWidth,
+         borderWidth: LARGER_BORDER_WIDTH,
          title: artist.bio
       });
 
       NodeIds.push(newNodeId);
-      renderCluster(newNodeId, artistsData.relations, { edges: { color: defaultColor } });
+      renderCluster(newNodeId, artistsData.relations, { edges: { color: BACKGROUND_COLOR } });
    }
    // if it exists, then we just create the relevant nodes around it
    else {
@@ -616,11 +618,11 @@ function createNode(artistsData, Xo, Yo) {
 
          // Augment node and node edge's and release it if fixed
          Network.body.edges[mainArtistNode.edges[0].id].setOptions({
-            length: largerEdgeLegth
+            length: LARGER_EDGE_LENGTH
          });
-         mainArtistNode.setOptions(releasedNodeOptions);
+         mainArtistNode.setOptions(RELEASED_NODE_OPTIONS);
 
-         let options = { edges: { color: defaultColor } };
+         let options = { edges: { color: BACKGROUND_COLOR } };
          renderCluster(
             mainArtistNode.options.id,
             artistsData.relations,

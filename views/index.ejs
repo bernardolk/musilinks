@@ -22,7 +22,7 @@
 <body>
 
    <!-- Open Search Button -->
-Imp   <div id="open-search-btn" class="quick-hidden btn-tooltip" data-tooltip="Refresh network">
+   Imp <div id="open-search-btn" class="quick-hidden btn-tooltip" data-tooltip="Refresh network">
       <img class="icon-img" src="search_refresh_white.png" />
    </div>
    <!-- Add artist Button -->
@@ -30,7 +30,7 @@ Imp   <div id="open-search-btn" class="quick-hidden btn-tooltip" data-tooltip="R
       <img class="icon-img" src="search_add.png" />
    </div>
    <!-- Open tutorial Button -->
-   <div id="open-tutorial-btn" class="quick-hidden" data-tooltip="Open video tutorial">
+   <div id="open-tutorial-btn" class="quick-hidden" data-tooltip="Instructions">
       <img class="icon-img" src="help_icon.png" />
    </div>
    <!-- Network -->
@@ -92,7 +92,7 @@ Imp   <div id="open-search-btn" class="quick-hidden btn-tooltip" data-tooltip="R
                   </a> -->
 
                   <div id="help-icon" class="placeholder-icon placeholder-icon-right"
-                     data-tooltip="How does this work?">
+                     data-tooltip="Frequently Asked Questions">
                      <img class="icon-img" src="help_icon.png" />
                   </div>
                </div>
@@ -107,18 +107,35 @@ Imp   <div id="open-search-btn" class="quick-hidden btn-tooltip" data-tooltip="R
          <div class="tutorial__modal__container" role="dialog" aria-modal="true" aria-labelledby="node-modal-title">
             <header class="modal__header">
                <h2 class="modal__title" id="tutorial-modal-title">
-                  One-Minute Demo
+                  Instructions
                </h2>
                <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
             </header>
-            <main class="modal__content" id="tutorial-modal-content">
-               <div class="iframe_container">
+            <main class="modal__content instructions" id="tutorial-modal-content">
+               <!-- <div class="iframe_container">
                   <div class="resp-container">
                      <iframe id="youtube-iframe" src="https://www.youtube.com/embed/HUkceRhj5uI" frameborder="0"
                         allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
                         allowfullscreen></iframe>
                   </div>
-               </div>
+               </div> -->
+               <h3>Basic commands</h3>
+               <ul>
+                  <li><span class="instructions_highlight">DRAG</span> nodes to 
+                     <span class="instructions_highlight">EXPAND</span> them</li>
+                  <li><span class="instructions_highlight">DOUBLE CLICK</span> on nodes to 
+                     <span class="instructions_highlight">EXPLORE</span></li>
+                  <li><span class="instructions_highlight">ADD</span> nodes or 
+                     <span class="instructions_highlight">REFRESH</span> network using top left buttons</li>
+                  <li>Use <span class="instructions_highlight">MOUSE WHEEL/PINCH MOVEMENT</span> (trackpad or touch) to <span class="instructions_highlight">ZOOM</span> in/out</li>
+               </ul><br>
+               <h3>Advanced commands</h3>
+               <ul>
+                  <li><span class="instructions_highlight">SELECT</span> node and <span class="instructions_highlight">DOUBLE CLICK</span> anywhere to <span class="instructions_highlight">FIX/UNFIX</span> it</li>
+                  <li><span class="instructions_highlight">DOUBLE CLICK</span> anywhere to <span class="instructions_highlight">EXPAND/CONTRACT</span> network</li>
+                  <li><span class="instructions_highlight">HOVER</span> on nodes and edges for 
+                     <span class="instructions_highlight">ADDITIONAL INFORMATION</span>  </li>
+               </ul>
             </main>
             <footer id="tutorial-modal-footer" class="modal__footer"></footer>
          </div>
@@ -139,22 +156,34 @@ Imp   <div id="open-search-btn" class="quick-hidden btn-tooltip" data-tooltip="R
          <div class="help__modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-title">
             <header class="modal__header">
                <h2 class="help__modal__title">
-                  How Musilinks Works
+                  F.A.Q.
                </h2>
                <button class="modal__close" aria-label="Close modal" data-micromodal-close></button>
             </header>
             <main class="help__modal__content">
+               <h3 class="instructions_highlight">What is this?</h3>
                Musilinks is an interactive experience that allows you to find and play around with musical relationships
-               between different artists/bands/personalities. <br> <br>
-               You can explore bands you like to find who's in that band. <br>
-               You can expand the related artists of two different bands to find out what bands live in the interception
-               between them. <br>
-               You can find new bands from your favorite artists that you didn't know they where a part of. <br>
-               And much more <br><br>
-               Relationships work like this: band -> members -> band -> members ... <br>
-               Musilinks utilizes both MusicBrainz.org and Spotify's databases to provide the experience. <br>
-               A video tutorial can be found in the interactive section for help with network controls.
-               Have fun :)
+               between different types of musical artists. <br> 
+               <ul>
+               <ui>You can explore bands you like to find who's in that band. </ui>
+               <ui>You can expand the related artists of two different bands to 
+               find out what bands live in the interception between them.  </ui>
+               <ui>You can find new bands from your favorite artists that you didn't know they where a part of.  </ui>
+            </ul>
+               ...And more
+               <h3 class="instructions_highlight">How is this possible?</h3>
+               Musilinks utilizes both MusicBrainz.org and Spotify's databases to provide the experience. The project is open-source and open to contributions.
+
+               <h3 class="instructions_highlight">Why some artists have a '?' instead of their pictures?</h3>
+               This means that, even though MusicBrainz has information about this artist and we can expose his
+               relationships, Spotify doesn't knows about him, so no Spotify profile is linked to this node.
+
+               <h3 class="instructions_highlight">Why sometimes an artist node is not really him when i double click on it?</h3>
+               We do our best to cross reference the two databases, but sometimes a good link cannot be created, 
+               specially if there are more than 1 artist with exactly the same name. In future versions we might fix 
+               that with the aid of our users.
+               <h3 class="instructions_highlight">Can i contribute with information on artists?</h3>
+               Sure! Head out to www.musicbrainz.org , create an account and start contributing!
             </main>
          </div>
       </div>
