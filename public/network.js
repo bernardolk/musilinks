@@ -273,13 +273,16 @@ async function openNodeModal(params) {
 
       relArtistsBtn.addEventListener("click", onRelArtistsBtnClick);
 
+      // spotify images are ranked by width, so first is highest res, last, lowest
       let relArtists = spotifyRelArtists.artists.map(artist => {
          return ({
             name: artist.name,
             spotifyId: artist.id,
             genres: artist.genres,
             image: artist.images.length > 0 ?
-               artist.images[artist.images.length - 1].url : NOT_FOUND_PIC
+               artist.images[artist.images.length - 1].url : NOT_FOUND_PIC,
+            highResImg: artist.images.length > 0 ? artist.images.length >= 3 ?
+               artist.images[1].url : artist.images[0].url : NOT_FOUND_PIC
          });
       });
 
@@ -300,7 +303,8 @@ async function openNodeModal(params) {
          RelatedArtistList.push({
             spotifyId: relArtists[i].spotifyId,
             name: relArtists[i].name,
-            img: relArtists[i].image
+            img: relArtists[i].image,
+            highResImg: relArtists[i].highResImg
          });
       });
    }
@@ -381,7 +385,7 @@ const onRelArtistsBtnClick = async function (event) {
       let relation = {
          spotify: {
             id: relatedArtist.spotifyId,
-            image: relatedArtist.img,
+            image: relatedArtist.highResImg,
          },
          name: relatedArtist.name,
          id: null
@@ -541,7 +545,7 @@ function renderCluster(targetNodeId, relatedArtists, options, _wasDragged) {
          }
       }
    }
-   if(createdNodeOrLink === false){
+   if (createdNodeOrLink === false) {
       targetNode.setOptions({ color: { border: NO_RELATED_ARTIST_COLOR } });
       return;
    }
