@@ -325,6 +325,12 @@ async function openNodeModal(params) {
 const onRelArtistsBtnClick = async function (event) {
    event.stopPropagation();
 
+   // pre download images before using
+   RelatedArtistList.map((artist) => {
+      var img = new Image();
+      img.src = artist.highResImg;
+   });
+
    if (SelectedNode.options.relArtistsCreated) {
       MicroModal.close("node-modal");
       return;
