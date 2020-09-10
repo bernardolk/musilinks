@@ -48,7 +48,11 @@ async function main() {
    });
 
    app.get("/", (_req, res) => {
-      res.render("index");
+      res.render("index", { 
+         analyticsTagManagerUrl: process.env.ANALYTICS_GTM_URL,
+         analyticsContainer: process.env.ANALYTICS_GTM_CONTAINER_ID, 
+         analyticsUA: process.env.ANALYTICS_GA_UA 
+      });
    });
 
    app.get("/token", async (_req, res) => {
@@ -114,7 +118,7 @@ async function refreshToken() {
          else if (exception.error === "RESPONSE_ERROR") {
             log("\n RESPONSE_ERROR error. Here is error object: \n");
          }
-         else{
+         else {
             log("\n ERROR_UNKNOWN error. Here is details: \n");
          }
          for (const prop in exception.details) {
