@@ -24,8 +24,6 @@ var globalDate = null;
 /////////////////////////////////////////////////
 //               MAIN EXECUTION
 /////////////////////////////////////////////////
-
-// var test = require("./testrandom");
 var getToken = require("./authentication");
 
 refreshToken();
@@ -37,7 +35,6 @@ async function main() {
    app.set("port", process.env.PORT || 3000);
    app.set("views", __dirname + "/views");
    app.set("view engine", "ejs");
-   //app.use(bodyparser.urlencoded({ extended: "true" }));
    app.use(express.static(path.join(__dirname, "public")));
 
    var jsonParser = bodyparser.json();
@@ -63,16 +60,6 @@ async function main() {
       let search = await searchMusicbrainz(req.body["search-text"]);
       res.json(search);
    });
-
-   // app.get("/logs", async (req, res) => {
-   //    if(req.query.pwd !== process.env.LOGPWD)
-   //       return res.send('<h1>Unauthorized</h1>');
-   // })
-
-   // app.get("/test", async function(req,res){
-   //    let rand = await test();
-   //    res.send(`<h1>${rand.value}</h1>`);
-   // })
 
    let server = http.createServer(app);
    server.on('error', (e) => console.log(e));
