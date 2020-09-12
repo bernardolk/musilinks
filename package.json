@@ -19,7 +19,7 @@
     "express": "^4.17.1",
     "lodash.debounce": "^4.0.8",
     "musicbrainz": "^0.2.6",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "request": "^2.88.0",
     "require": "^2.4.20",
     "vis-network": "^6.4.6",
