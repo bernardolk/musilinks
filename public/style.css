@@ -912,6 +912,18 @@ input {
    .artist__modal__container{
       max-height: unset;
    }
+
+   .instructions{
+      font-size: 0.8rem;
+      margin: 8px;
+   }
+
+   .instructions h3{
+      margin: 2px;
+   }
+   .instructions ul{
+      margin: 0;
+   }
 }
 
  @media (max-width: 700px){
@@ -962,6 +974,7 @@ input {
       width: 95%;
       padding: 15px;
       max-height: 70vh;
+      overflow-y: auto;
    }
    
    /*tutorial modal*/
@@ -1006,6 +1019,10 @@ input {
    }
 
    .help__modal__content{
+      font-size: 0.8rem;
+   }
+
+   .instructions{
       font-size: 0.8rem;
    }
  }
