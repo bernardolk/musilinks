@@ -15,18 +15,18 @@ Musilinks is an interactive experience that allows you to find and play around w
 between different types of musical artists. <br> 
 
 * You can explore bands you like to find who's in that band.
-* You can expand the related artists of two different bands to find out what bands live in the interception between them. 
-* You can find new bands from your favorite artists that you didn't know they where a part of.
+* You can expand the related artists of two different bands to find out what bands live in the intersection between them. 
+* You can find new bands from your favorite artists that you didn't know they were a part of.
 * ...And more
 
 **How is this possible?**
 
-Musilinks cross-reference both MusicBrainz.org and Spotify's databases to provide it's experience. 
+Musilinks cross-references both MusicBrainz.org and Spotify's databases to provide it's experience. 
 
 **Why some artists have a '?' instead of their pictures?**
 
 This means that, even though MusicBrainz has information about this artist and we can expose his
-relationships, Spotify doesn't knows about him, so no Spotify profile is linked to this node.
+relationships, Spotify doesn't knows about him. So, no Spotify profile is linked to this node.
 
 **Why sometimes an artist node is not really him when i double click on it?**
 
