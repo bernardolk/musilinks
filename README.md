@@ -20,21 +20,13 @@ between different types of musical artists. <br>
 * ...And more
 
 **How is this possible?**
-
-Musilinks cross-references both MusicBrainz.org and Spotify's databases to provide it's experience. 
+Musilinks cross-references both MusicBrainz.org and Spotify's databases to provide its experience.
 
 **Why some artists have a '?' instead of their pictures?**
+This means that, even though MusicBrainz has information about this artist and we can expose his relationships, Spotify doesn't know about him. So, no Spotify profile is linked to this node.
 
-This means that, even though MusicBrainz has information about this artist and we can expose his
-relationships, Spotify doesn't knows about him. So, no Spotify profile is linked to this node.
+**Why sometimes an artist node is not really him when I double click on it?**
+We do our best to cross-reference the two databases, but sometimes a good link cannot be created, especially if there is more than 1 artist with exactly the same name. In future versions, we might fix that with the aid of our users.
 
-**Why sometimes an artist node is not really him when i double click on it?**
-
-We do our best to cross reference the two databases, but sometimes a good link cannot be created, 
-specially if there are more than 1 artist with exactly the same name. In future versions we might fix 
-that with the aid of our users.
-
-**Can i contribute with information on artists?**
-
+**Can I contribute with information on artists?**
 Sure! Head out to www.musicbrainz.org , create an account and start contributing!
-
