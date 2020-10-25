@@ -4,25 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "nodemon": "nodemon app.js --inspect"
+    "nodemon": "nodemon index.js --inspect",
+    "start" : "node index"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "bernardolk",
+  "license": "MIT",
   "dependencies": {
     "body-parser": "^1.19.0",
-    "browserify": "^16.5.0",
-    "config": "^3.2.4",
-    "dependencies": "0.0.1",
     "ejs": "^2.7.4",
-    "exorcist": "^1.0.1",
     "express": "^4.17.1",
     "lodash.debounce": "^4.0.8",
     "musicbrainz": "^0.2.6",
-    "node-fetch": "^2.6.0",
-    "request": "^2.88.0",
-    "require": "^2.4.20",
-    "vis-network": "^6.4.6",
-    "watchify": "^3.11.1"
+    "vis-network": "^6.4.6"
   }
 }

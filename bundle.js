@@ -1,1 +1,0 @@
-console.error("Error: Cannot find module 'C:\\Repositorios\\musilinks\\events.js' from 'C:\\Repositorios\\musilinks'");
